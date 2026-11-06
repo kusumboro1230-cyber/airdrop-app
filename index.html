@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MySuperAirdrop Tap Game</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+        body {
+            background: linear-gradient(135deg, #070b14, #131b2e);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px 20px;
+            overflow: hidden;
+        }
+        .header {
+            margin-top: 10px;
+        }
+        .label {
+            color: #94a3b8;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        .score-container {
+            font-size: 52px;
+            font-weight: 800;
+            color: #fbbf24;
+            text-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+            margin-top: 5px;
+        }
+        .coin-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+        }
+        .coin {
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, #fde047 0%, #f59e0b 60%, #b45309 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 85px;
+            cursor: pointer;
+            box-shadow: 0 0 50px rgba(245, 158, 11, 0.5), inset 0 0 25px rgba(255, 255, 255, 0.5);
+            transition: transform 0.05s ease;
+            position: relative;
+        }
+        .coin:active {
+            transform: scale(0.92);
+        }
+        .energy-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .energy-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .energy-bar {
+            width: 100%;
+            height: 12px;
+            background: #1e293b;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .energy-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #38bdf8, #6366f1);
+            transition: width 0.1s linear;
+        }
+        .floating-num {
+            position: absolute;
+            color: #38bdf8;
+            font-size: 28px;
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatUp 0.7s ease-out forwards;
+            left: 50%;
+            top: 30%;
+            transform: translateX(-50%);
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -70px) scale(1.3); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="label">Total Points</div>
+        <div class="score-container" id="score">0</div>
+    </div>
+
+    <div class="coin-wrapper" id="coinWrapper">
+        <div class="coin" id="coin">🪙</div>
+    </div>
+
+    <div class="energy-box">
+        <div class="energy-info">
+            <span>⚡ Energy</span>
+            <span id="energyText">1000 / 1000</span>
+        </div>
+        <div class="energy-bar">
+            <div class="energy-fill" id="energyFill"></div>
+        </div>
+    </div>
+
+    <script>
+        let score = parseInt(localStorage.getItem('airdrop_score')) || 0;
+        let energy = parseInt(localStorage.getItem('airdrop_energy')) || 1000;
+        const maxEnergy = 1000;
+
+        const scoreEl = document.getElementById('score');
+        const energyTextEl = document.getElementById('energyText');
+        const energyFillEl = document.getElementById('energyFill');
+        const coinWrapper = document.getElementById('coinWrapper');
+        const coin = document.getElementById('coin');
+
+        scoreEl.innerText = score;
+        energyTextEl.innerText = `${energy} / ${maxEnergy}`;
+        energyFillEl.style.width = `${(energy / maxEnergy) * 100}%`;
+
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        coin.addEventListener('click', function(e) {
+            if (energy > 0) {
+                score += 1;
+                energy -= 1;
+                
+                scoreEl.innerText = score;
+                energyTextEl.innerText = `${energy} / ${maxEnergy}`;
+                energyFillEl.style.width = `${(energy / maxEnergy) * 100}%`;
+
+                localStorage.setItem('airdrop_score', score);
+                localStorage.setItem('airdrop_energy', energy);
+
+                if (tg.HapticFeedback) {
+                    tg.HapticFeedback.impactOccurred('medium');
+                }
+
+                showFloatingNumber();
+            }
+        });
+
+        // Energy automatic recharge every second
+        setInterval(() => {
+            if (energy < maxEnergy) {
+                energy += 5;
+                if (energy > maxEnergy) energy = maxEnergy;
+                energyTextEl.innerText = `${energy} / ${maxEnergy}`;
+                energyFillEl.style.width = `${(energy / maxEnergy) * 100}%`;
+                localStorage.setItem('airdrop_energy', energy);
+            }
+        }, 1000);
+
+        function showFloatingNumber() {
+            const floatEl = document.createElement('div');
+            floatEl.className = 'floating-num';
+            floatEl.innerText = '+1';
+            coinWrapper.appendChild(floatEl);
+            setTimeout(() => {
+                floatEl.remove();
+            }, 700);
+        }
+    </script>
+</body>
+</html>
