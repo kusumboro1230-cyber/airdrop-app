@@ -2,37 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Prediction Pattern & Loss Analyzer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Game Pattern & Loss Analyzer</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #121212; color: #ffffff; padding: 20px; text-align: center; }
-        .container { max-width: 800px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        h1 { color: #00e676; margin-bottom: 10px; font-size: 24px; }
-        p { color: #bbb; font-size: 14px; margin-bottom: 20px; }
+        body { background: #121212; color: #ffffff; padding: 10px; text-align: center; }
+        .container { max-width: 100%; width: 100%; margin: 0 auto; background: #1e1e1e; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
         
-        .number-pad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
-        .num-btn { padding: 15px; font-size: 20px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; color: #fff; transition: 0.2s; }
-        .num-btn:hover { opacity: 0.85; transform: scale(0.98); }
+        h1 { color: #00e676; margin-bottom: 5px; font-size: 20px; }
+        p { color: #bbb; font-size: 12px; margin-bottom: 15px; }
+        
+        /* Mobile Optimized Number Pad */
+        .number-pad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 15px; }
+        .num-btn { padding: 12px 0; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; color: #fff; transition: 0.1s; }
+        .num-btn:active { transform: scale(0.92); }
         .red { background: #e53935; }
         .green { background: #43a047; }
         .violet { background: #8e24aa; }
 
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .card { background: #2a2a2a; padding: 15px; border-radius: 8px; border: 1px solid #333; }
-        .card h3 { font-size: 14px; color: #aaa; margin-bottom: 8px; }
-        .card .val { font-size: 22px; font-weight: bold; }
+        /* Dashboard Grid for Mobile */
+        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+        .card { background: #2a2a2a; padding: 12px; border-radius: 8px; border: 1px solid #333; text-align: center; }
+        .card h3 { font-size: 11px; color: #aaa; margin-bottom: 5px; letter-spacing: 0.5px; }
+        .card .val { font-size: 18px; font-weight: bold; }
+        
         .pred-big { color: #ff9800; }
         .pred-small { color: #29b6f6; }
         .win { color: #4caf50; }
         .loss { color: #f44336; }
 
-        .analysis-box { background: #252525; padding: 15px; border-radius: 8px; text-align: left; margin-bottom: 20px; border-left: 4px solid #00e676; }
-        .analysis-box h4 { margin-bottom: 5px; color: #00e676; }
+        .analysis-box { background: #252525; padding: 12px; border-radius: 8px; text-align: left; margin-bottom: 15px; border-left: 4px solid #00e676; font-size: 13px; }
+        .analysis-box h4 { margin-bottom: 4px; color: #00e676; font-size: 13px; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-        th, td { padding: 10px; border-bottom: 1px solid #333; text-align: center; }
-        th { background: #2a2a2a; color: #888; }
+        /* Table container for responsiveness */
+        .table-container { max-height: 250px; overflow-y: auto; border-radius: 8px; border: 1px solid #333; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 8px 6px; border-bottom: 1px solid #333; text-align: center; }
+        th { background: #2a2a2a; color: #888; position: sticky; top: 0; z-index: 1; }
+        
         .tag-big { color: #ff9800; font-weight: bold; }
         .tag-small { color: #29b6f6; font-weight: bold; }
     </style>
@@ -40,9 +47,10 @@
 <body>
 
 <div class="container">
-    <h1>Game Pattern & Loss Analyzer</h1>
-    <p>Select the result number of each round to calculate math logic & trend predictions.</p>
+    <h1>Pattern & Loss Analyzer</h1>
+    <p>Tap result number to calculate prediction.</p>
 
+    <!-- Number Pad -->
     <div class="number-pad">
         <button class="num-btn violet" onclick="addRound(0)">0</button>
         <button class="num-btn green" onclick="addRound(1)">1</button>
@@ -56,6 +64,7 @@
         <button class="num-btn green" onclick="addRound(9)">9</button>
     </div>
 
+    <!-- Dashboard Cards -->
     <div class="dashboard">
         <div class="card">
             <h3>NEXT PREDICTION</h3>
@@ -75,24 +84,28 @@
         </div>
     </div>
 
+    <!-- Analysis Box -->
     <div class="analysis-box">
-        <h4>Loss & Pattern Analysis Note:</h4>
-        <div id="analysis-text">Enter at least 3-5 rounds of data to start pattern recognition.</div>
+        <h4>Analysis Note:</h4>
+        <div id="analysis-text">Enter rounds to start pattern recognition.</div>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Round</th>
-                <th>Number</th>
-                <th>Category</th>
-                <th>Predicted</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody id="history-table">
-        </tbody>
-    </table>
+    <!-- History Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Rnd</th>
+                    <th>No</th>
+                    <th>Cat</th>
+                    <th>Pred</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="history-table">
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
@@ -109,7 +122,6 @@
         const category = getCategory(number);
         let status = 'N/A';
 
-        // Check if previous prediction matched
         if (nextPrediction) {
             if (nextPrediction === category) {
                 status = 'WIN';
@@ -129,16 +141,12 @@
         };
 
         history.push(roundData);
-
-        // Calculate next prediction using Math Logic
         nextPrediction = calculateNextPrediction();
-
-        // Update UI
         updateUI();
     }
 
     function calculateNextPrediction() {
-        if (history.length < 2) return 'BIG'; // Default baseline
+        if (history.length < 2) return 'BIG';
 
         const categories = history.map(h => h.category);
         const total = categories.length;
@@ -147,17 +155,14 @@
         const last2 = categories[total - 2];
         const last3 = total >= 3 ? categories[total - 3] : null;
 
-        // Pattern 1: Dragon / Trend Follow (3 times same streak)
         if (last1 === last2 && last2 === last3) {
-            return last1; // Continuous trend continuation
+            return last1;
         }
 
-        // Pattern 2: Single Alternating / ABAB Pattern (e.g., BIG, SMALL, BIG)
         if (last1 !== last2 && last2 === last3) {
             return last1 === 'BIG' ? 'SMALL' : 'BIG';
         }
 
-        // Pattern 3: Weighted Frequency Analysis (Last 10 rounds)
         const recent = categories.slice(-10);
         const bigCount = recent.filter(c => c === 'BIG').length;
         const smallCount = recent.filter(c => c === 'SMALL').length;
@@ -165,7 +170,6 @@
         if (bigCount > smallCount) return 'BIG';
         if (smallCount > bigCount) return 'SMALL';
 
-        // Default Reversal
         return last1 === 'BIG' ? 'SMALL' : 'BIG';
     }
 
@@ -196,7 +200,7 @@
 
         const totalEvaluated = wins + losses;
         const accuracy = totalEvaluated > 0 ? Math.round((wins / totalEvaluated) * 100) : 0;
-        document.getElementById('accuracy').innerText = `${accuracy}% (${wins}W / ${losses}L)`;
+        document.getElementById('accuracy').innerText = `${accuracy}% (${wins}W/${losses}L)`;
 
         updateAnalysisText();
     }
@@ -204,7 +208,7 @@
     function updateAnalysisText() {
         const textElem = document.getElementById('analysis-text');
         if (history.length === 0) {
-            textElem.innerText = "Enter numbers as they appear in the game to build the prediction model.";
+            textElem.innerText = "Tap buttons above to record round results.";
             return;
         }
 
@@ -212,7 +216,7 @@
         let note = "";
 
         if (recentLosses >= 2) {
-            note = "⚠️ High volatility detected (Multiple Losses). Market flipping fast—wait 1-2 rounds.";
+            note = "⚠️ High volatility (Multiple Losses). Wait 1-2 rounds.";
         } else {
             const categories = history.map(h => h.category);
             const last = categories[categories.length - 1];
@@ -224,9 +228,9 @@
             }
 
             if (streakCount >= 3) {
-                note = `🔥 Strong Trend (${streakCount}x ${last}): Logic is following continuous ${last} pattern.`;
+                note = `🔥 Strong Trend (${streakCount}x ${last}): Following continuous pattern.`;
             } else {
-                note = "✅ Normal Pattern: Using frequency and ABAB alternating evaluation.";
+                note = "✅ Normal Pattern: Using frequency & ABAB evaluation.";
             }
         }
 
