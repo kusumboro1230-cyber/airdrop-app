@@ -1,243 +1,680 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Pattern & Loss Analyzer</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #121212; color: #ffffff; padding: 10px; text-align: center; }
-        .container { max-width: 100%; width: 100%; margin: 0 auto; background: #1e1e1e; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        
-        h1 { color: #00e676; margin-bottom: 5px; font-size: 20px; }
-        p { color: #bbb; font-size: 12px; margin-bottom: 15px; }
-        
-        /* Mobile Optimized Number Pad */
-        .number-pad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 15px; }
-        .num-btn { padding: 12px 0; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; color: #fff; transition: 0.1s; }
-        .num-btn:active { transform: scale(0.92); }
-        .red { background: #e53935; }
-        .green { background: #43a047; }
-        .violet { background: #8e24aa; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pro Pattern Analyzer</title>
 
-        /* Dashboard Grid for Mobile */
-        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
-        .card { background: #2a2a2a; padding: 12px; border-radius: 8px; border: 1px solid #333; text-align: center; }
-        .card h3 { font-size: 11px; color: #aaa; margin-bottom: 5px; letter-spacing: 0.5px; }
-        .card .val { font-size: 18px; font-weight: bold; }
-        
-        .pred-big { color: #ff9800; }
-        .pred-small { color: #29b6f6; }
-        .win { color: #4caf50; }
-        .loss { color: #f44336; }
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
 
-        .analysis-box { background: #252525; padding: 12px; border-radius: 8px; text-align: left; margin-bottom: 15px; border-left: 4px solid #00e676; font-size: 13px; }
-        .analysis-box h4 { margin-bottom: 4px; color: #00e676; font-size: 13px; }
+body {
+    background: #090d16;
+    color: #fff;
+    padding: 15px;
+}
 
-        /* Table container for responsiveness */
-        .table-container { max-height: 250px; overflow-y: auto; border-radius: 8px; border: 1px solid #333; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th, td { padding: 8px 6px; border-bottom: 1px solid #333; text-align: center; }
-        th { background: #2a2a2a; color: #888; position: sticky; top: 0; z-index: 1; }
-        
-        .tag-big { color: #ff9800; font-weight: bold; }
-        .tag-small { color: #29b6f6; font-weight: bold; }
-    </style>
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+.header {
+    text-align: center;
+    padding: 25px 10px;
+}
+
+.header h1 {
+    color: #00f5a0;
+    font-size: 27px;
+    letter-spacing: 1px;
+}
+
+.header p {
+    color: #8c9bad;
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+.panel {
+    background: #141c2b;
+    border: 1px solid #263449;
+    border-radius: 14px;
+    padding: 17px;
+    margin-bottom: 15px;
+}
+
+.panel h2 {
+    font-size: 15px;
+    color: #00f5a0;
+    margin-bottom: 15px;
+}
+
+.number-pad {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+.num-btn {
+    border: none;
+    padding: 17px 5px;
+    border-radius: 10px;
+    font-size: 21px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.num-btn:hover {
+    filter: brightness(1.25);
+    transform: translateY(-2px);
+}
+
+.num-btn:active {
+    transform: scale(.94);
+}
+
+.red { background: #e53950; }
+.green { background: #16a66a; }
+.violet { background: #883cce; }
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat {
+    background: #1b2638;
+    border: 1px solid #293b52;
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.stat h3 {
+    color: #9aabc0;
+    font-size: 11px;
+    margin-bottom: 9px;
+}
+
+.value {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.green-text { color: #00e89a; }
+.blue-text { color: #36baff; }
+.orange-text { color: #ffae42; }
+.red-text { color: #ff5265; }
+
+.bar-bg {
+    height: 11px;
+    background: #293448;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    margin: 12px 0;
+}
+
+.bar-big {
+    background: #ff9e35;
+    width: 0%;
+    transition: .3s;
+}
+
+.bar-small {
+    background: #29b6f6;
+    width: 0%;
+    transition: .3s;
+}
+
+.detail {
+    color: #b5c2d2;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.pattern-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.pattern {
+    padding: 13px;
+    border-radius: 10px;
+    background: #202d40;
+}
+
+.pattern span {
+    display: block;
+    font-size: 11px;
+    color: #94a5bb;
+    margin-bottom: 7px;
+}
+
+.pattern strong {
+    font-size: 18px;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 15px;
+}
+
+.action-btn {
+    flex: 1;
+    min-width: 100px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    background: #34445d;
+}
+
+.action-btn:hover {
+    filter: brightness(1.2);
+}
+
+.export { background: #087e59; }
+.undo { background: #b77b22; }
+.reset { background: #b83248; }
+
+.filters {
+    width: 100%;
+    padding: 10px;
+    background: #202d40;
+    color: white;
+    border: 1px solid #40516a;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+    max-height: 350px;
+    border: 1px solid #304057;
+    border-radius: 9px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    min-width: 380px;
+}
+
+th, td {
+    padding: 12px 8px;
+    text-align: center;
+    border-bottom: 1px solid #2b3a50;
+}
+
+th {
+    position: sticky;
+    top: 0;
+    background: #26354b;
+    color: #9caec5;
+}
+
+.tag-big {
+    color: #ffae42;
+    font-weight: bold;
+}
+
+.tag-small {
+    color: #36baff;
+    font-weight: bold;
+}
+
+.footer {
+    text-align: center;
+    color: #697b91;
+    font-size: 11px;
+    padding: 20px;
+}
+
+.notice {
+    color: #c4d1e0;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+@media(max-width:450px) {
+    body { padding: 9px; }
+    .header h1 { font-size: 22px; }
+    .panel { padding: 13px; }
+    .num-btn { padding: 14px 3px; }
+    .value { font-size: 21px; }
+}
+</style>
 </head>
+
 <body>
-
 <div class="container">
-    <h1>Pattern & Loss Analyzer</h1>
-    <p>Tap result number to calculate prediction.</p>
 
-    <!-- Number Pad -->
-    <div class="number-pad">
-        <button class="num-btn violet" onclick="addRound(0)">0</button>
-        <button class="num-btn green" onclick="addRound(1)">1</button>
-        <button class="num-btn red" onclick="addRound(2)">2</button>
-        <button class="num-btn green" onclick="addRound(3)">3</button>
-        <button class="num-btn red" onclick="addRound(4)">4</button>
-        <button class="num-btn violet" onclick="addRound(5)">5</button>
-        <button class="num-btn red" onclick="addRound(6)">6</button>
-        <button class="num-btn green" onclick="addRound(7)">7</button>
-        <button class="num-btn red" onclick="addRound(8)">8</button>
-        <button class="num-btn green" onclick="addRound(9)">9</button>
+<header class="header">
+    <h1>⚡ PRO PATTERN ANALYZER</h1>
+    <p>Game History & Statistical Dashboard</p>
+</header>
+
+<section class="panel">
+    <h2>NUMBER INPUT</h2>
+    <div class="number-pad" id="numberPad"></div>
+
+    <div class="actions">
+        <button class="action-btn undo" onclick="undoLast()">↶ Undo</button>
+        <button class="action-btn reset" onclick="resetData()">Reset All</button>
+        <button class="action-btn export" onclick="exportCSV()">↓ Export CSV</button>
     </div>
+</section>
 
-    <!-- Dashboard Cards -->
+<section class="panel">
+    <h2>LIVE DASHBOARD</h2>
     <div class="dashboard">
-        <div class="card">
-            <h3>NEXT PREDICTION</h3>
-            <div id="prediction" class="val">-</div>
-        </div>
-        <div class="card">
+
+        <div class="stat">
             <h3>TOTAL ROUNDS</h3>
-            <div id="total-rounds" class="val">0</div>
+            <div class="value green-text" id="total">0</div>
         </div>
-        <div class="card">
-            <h3>ACCURACY</h3>
-            <div id="accuracy" class="val">0%</div>
+
+        <div class="stat">
+            <h3>BIG RESULTS</h3>
+            <div class="value orange-text" id="bigCount">0</div>
         </div>
-        <div class="card">
-            <h3>LAST CATEGORY</h3>
-            <div id="streak" class="val">-</div>
+
+        <div class="stat">
+            <h3>SMALL RESULTS</h3>
+            <div class="value blue-text" id="smallCount">0</div>
         </div>
+
+        <div class="stat">
+            <h3>LAST RESULT</h3>
+            <div class="value" id="lastResult">-</div>
+        </div>
+
+    </div>
+</section>
+
+<section class="panel">
+    <h2>BIG / SMALL DISTRIBUTION</h2>
+
+    <div class="bar-bg">
+        <div class="bar-big" id="bigBar"></div>
+        <div class="bar-small" id="smallBar"></div>
     </div>
 
-    <!-- Analysis Box -->
-    <div class="analysis-box">
-        <h4>Analysis Note:</h4>
-        <div id="analysis-text">Enter rounds to start pattern recognition.</div>
+    <div class="detail" id="distribution">
+        BIG: 0% | SMALL: 0%
+    </div>
+</section>
+
+<section class="panel">
+    <h2>PATTERN ANALYSIS</h2>
+
+    <div class="pattern-grid">
+
+        <div class="pattern">
+            <span>CURRENT STREAK</span>
+            <strong id="streak">-</strong>
+        </div>
+
+        <div class="pattern">
+            <span>LONGEST STREAK</span>
+            <strong id="longest">0</strong>
+        </div>
+
+        <div class="pattern">
+            <span>ALTERNATING PATTERN</span>
+            <strong id="alternating">-</strong>
+        </div>
+
+        <div class="pattern">
+            <span>REPEATED RESULTS</span>
+            <strong id="repeats">0</strong>
+        </div>
+
+        <div class="pattern">
+            <span>BIG IN LAST 10</span>
+            <strong id="recentBig">0</strong>
+        </div>
+
+        <div class="pattern">
+            <span>SMALL IN LAST 10</span>
+            <strong id="recentSmall">0</strong>
+        </div>
+
     </div>
 
-    <!-- History Table -->
-    <div class="table-container">
+    <p class="detail" id="analysis" style="margin-top:15px">
+        Add results to begin statistical analysis.
+    </p>
+</section>
+
+<section class="panel">
+    <h2>ROUND HISTORY</h2>
+
+    <select class="filters" id="filter" onchange="updateTable()">
+        <option value="all">All Results</option>
+        <option value="10">Last 10 Rounds</option>
+        <option value="20">Last 20 Rounds</option>
+        <option value="50">Last 50 Rounds</option>
+    </select>
+
+    <div class="table-wrap">
         <table>
             <thead>
                 <tr>
-                    <th>Rnd</th>
-                    <th>No</th>
-                    <th>Cat</th>
-                    <th>Pred</th>
-                    <th>Status</th>
+                    <th>ROUND</th>
+                    <th>NUMBER</th>
+                    <th>CATEGORY</th>
+                    <th>COLOR</th>
                 </tr>
             </thead>
-            <tbody id="history-table">
-            </tbody>
+            <tbody id="historyTable"></tbody>
         </table>
     </div>
+</section>
+
+<section class="panel">
+    <h2>ABOUT ANALYSIS</h2>
+    <p class="notice">
+        This dashboard records historical results and calculates
+        descriptive statistics. BIG means 5–9 and SMALL means 0–4.
+        Historical patterns do not establish what the next random
+        result will be. Percentages describe recorded data only.
+    </p>
+</section>
+
+<footer class="footer">
+    PRO PATTERN ANALYZER • LOCAL DATA STORAGE
+</footer>
+
 </div>
 
 <script>
-    let history = [];
-    let wins = 0;
-    let losses = 0;
-    let nextPrediction = null;
+let history = [];
 
-    function getCategory(num) {
-        return num <= 4 ? 'SMALL' : 'BIG';
+const colors = [
+    "Violet", "Green", "Red", "Green", "Red",
+    "Violet", "Red", "Green", "Red", "Green"
+];
+
+function getCategory(n) {
+    return n <= 4 ? "SMALL" : "BIG";
+}
+
+function getColor(n) {
+    return colors[n];
+}
+
+function saveData() {
+    try {
+        localStorage.setItem(
+            "proAnalyzerHistory",
+            JSON.stringify(history)
+        );
+    } catch(e) {
+        console.warn("Could not save data", e);
+    }
+}
+
+function loadData() {
+    try {
+        const saved = localStorage.getItem("proAnalyzerHistory");
+        const parsed = saved ? JSON.parse(saved) : [];
+
+        if (Array.isArray(parsed) &&
+            parsed.every(x => Number.isInteger(x) &&
+            x >= 0 && x <= 9)) {
+            history = parsed;
+        }
+    } catch(e) {
+        history = [];
+    }
+}
+
+function createPad() {
+    const pad = document.getElementById("numberPad");
+
+    for(let i = 0; i <= 9; i++) {
+        const btn = document.createElement("button");
+        btn.className = "num-btn " +
+            (i === 0 || i === 5 ? "violet" :
+            (i === 1 || i === 3 || i === 7 || i === 9 ?
+            "green" : "red"));
+
+        btn.textContent = i;
+        btn.addEventListener("click", () => addRound(i));
+        pad.appendChild(btn);
+    }
+}
+
+function addRound(n) {
+    history.push(n);
+    saveData();
+    updateUI();
+}
+
+function undoLast() {
+    if(!history.length) return;
+
+    history.pop();
+    saveData();
+    updateUI();
+}
+
+function resetData() {
+    if(!confirm("Are you sure you want to clear all history?"))
+        return;
+
+    history = [];
+    saveData();
+    updateUI();
+}
+
+function percentage(value, total) {
+    return total ? ((value / total) * 100).toFixed(1) : "0.0";
+}
+
+function calculateStats() {
+    const categories = history.map(getCategory);
+    const total = history.length;
+
+    const big = categories.filter(x => x === "BIG").length;
+    const small = total - big;
+
+    let streak = 0;
+    let longest = 0;
+    let repeats = 0;
+    let current = null;
+    let previous = null;
+
+    for(let i = 0; i < total; i++) {
+        const cat = categories[i];
+
+        if(cat === current) {
+            streak++;
+        } else {
+            current = cat;
+            streak = 1;
+        }
+
+        longest = Math.max(longest, streak);
+
+        if(cat === previous) repeats++;
+        previous = cat;
     }
 
-    function addRound(number) {
-        const category = getCategory(number);
-        let status = 'N/A';
+    const recent = categories.slice(-10);
+    const recentBig = recent.filter(x => x === "BIG").length;
+    const recentSmall = recent.length - recentBig;
 
-        if (nextPrediction) {
-            if (nextPrediction === category) {
-                status = 'WIN';
-                wins++;
-            } else {
-                status = 'LOSS';
-                losses++;
+    let alternating = 0;
+
+    for(let i = Math.max(1, total - 5); i < total; i++) {
+        if(categories[i] !== categories[i-1]) alternating++;
+    }
+
+    return {
+        total, big, small, categories,
+        streak, longest, repeats,
+        recentBig, recentSmall,
+        alternating
+    };
+}
+
+function updateUI() {
+    const s = calculateStats();
+
+    document.getElementById("total").textContent = s.total;
+    document.getElementById("bigCount").textContent = s.big;
+    document.getElementById("smallCount").textContent = s.small;
+
+    const last = history.length
+        ? getCategory(history[history.length - 1])
+        : "-";
+
+    const lastElement = document.getElementById("lastResult");
+    lastElement.textContent = last;
+    lastElement.className = "value " +
+        (last === "BIG" ? "orange-text" :
+        last === "SMALL" ? "blue-text" : "");
+
+    const bigPercent = Number(percentage(s.big, s.total));
+    const smallPercent = Number(percentage(s.small, s.total));
+
+    document.getElementById("bigBar").style.width =
+        bigPercent + "%";
+
+    document.getElementById("smallBar").style.width =
+        smallPercent + "%";
+
+    document.getElementById("distribution").textContent =
+        `BIG: ${bigPercent}% (${s.big}) | ` +
+        `SMALL: ${smallPercent}% (${s.small})`;
+
+    document.getElementById("streak").textContent =
+        s.total ? `${last} × ${s.streak}` : "-";
+
+    document.getElementById("longest").textContent =
+        s.longest;
+
+    document.getElementById("alternating").textContent =
+        s.total < 3 ? "-" :
+        s.alternating >= 4 ? "Strong ABAB" :
+        s.alternating >= 2 ? "Partial" : "No pattern";
+
+    document.getElementById("repeats").textContent =
+        s.repeats;
+
+    document.getElementById("recentBig").textContent =
+        s.recentBig;
+
+    document.getElementById("recentSmall").textContent =
+        s.recentSmall;
+
+    let note = "Add more rounds for statistical analysis.";
+
+    if(s.total >= 3) {
+        if(s.streak >= 3) {
+            note = `A ${s.streak}-round ${last} streak is present in the recorded history.`;
+        } else if(s.alternating >= 4) {
+            note = "The last several results show an alternating pattern.";
+        } else {
+            note = "No strong descriptive pattern detected in the recent results.";
+        }
+    }
+
+    document.getElementById("analysis").textContent =
+        note;
+
+    updateTable();
+}
+
+function updateTable() {
+    const tbody = document.getElementById("historyTable");
+    tbody.innerHTML = "";
+
+    const filter = document.getElementById("filter").value;
+
+    let entries = history.map((n, i) => ({
+        number: n,
+        round: i + 1
+    }));
+
+    if(filter !== "all") {
+        entries = entries.slice(-Number(filter));
+    }
+
+    entries.reverse().forEach(row => {
+        const cat = getCategory(row.number);
+        const tr = document.createElement("tr");
+
+        const values = [
+            "#" + row.round,
+            row.number,
+            cat,
+            getColor(row.number)
+        ];
+
+        values.forEach((value, i) => {
+            const td = document.createElement("td");
+            td.textContent = value;
+
+            if(i === 2) {
+                td.className = cat === "BIG"
+                    ? "tag-big" : "tag-small";
             }
-        }
 
-        const roundData = {
-            round: history.length + 1,
-            number: number,
-            category: category,
-            predicted: nextPrediction || 'WAITING',
-            status: status
-        };
-
-        history.push(roundData);
-        nextPrediction = calculateNextPrediction();
-        updateUI();
-    }
-
-    function calculateNextPrediction() {
-        if (history.length < 2) return 'BIG';
-
-        const categories = history.map(h => h.category);
-        const total = categories.length;
-        
-        const last1 = categories[total - 1];
-        const last2 = categories[total - 2];
-        const last3 = total >= 3 ? categories[total - 3] : null;
-
-        if (last1 === last2 && last2 === last3) {
-            return last1;
-        }
-
-        if (last1 !== last2 && last2 === last3) {
-            return last1 === 'BIG' ? 'SMALL' : 'BIG';
-        }
-
-        const recent = categories.slice(-10);
-        const bigCount = recent.filter(c => c === 'BIG').length;
-        const smallCount = recent.filter(c => c === 'SMALL').length;
-
-        if (bigCount > smallCount) return 'BIG';
-        if (smallCount > bigCount) return 'SMALL';
-
-        return last1 === 'BIG' ? 'SMALL' : 'BIG';
-    }
-
-    function updateUI() {
-        const tbody = document.getElementById('history-table');
-        tbody.innerHTML = '';
-        
-        [...history].reverse().forEach(row => {
-            const tr = document.createElement('tr');
-            const catClass = row.category === 'BIG' ? 'tag-big' : 'tag-small';
-            const statusClass = row.status === 'WIN' ? 'win' : (row.status === 'LOSS' ? 'loss' : '');
-            
-            tr.innerHTML = `
-                <td>#${row.round}</td>
-                <td><b>${row.number}</b></td>
-                <td class="${catClass}">${row.category}</td>
-                <td>${row.predicted}</td>
-                <td class="${statusClass}"><b>${row.status}</b></td>
-            `;
-            tbody.appendChild(tr);
+            tr.appendChild(td);
         });
 
-        document.getElementById('total-rounds').innerText = history.length;
-        
-        const predElem = document.getElementById('prediction');
-        predElem.innerText = nextPrediction;
-        predElem.className = nextPrediction === 'BIG' ? 'val pred-big' : 'val pred-small';
+        tbody.appendChild(tr);
+    });
+}
 
-        const totalEvaluated = wins + losses;
-        const accuracy = totalEvaluated > 0 ? Math.round((wins / totalEvaluated) * 100) : 0;
-        document.getElementById('accuracy').innerText = `${accuracy}% (${wins}W/${losses}L)`;
-
-        updateAnalysisText();
+function exportCSV() {
+    if(!history.length) {
+        alert("No history available to export.");
+        return;
     }
 
-    function updateAnalysisText() {
-        const textElem = document.getElementById('analysis-text');
-        if (history.length === 0) {
-            textElem.innerText = "Tap buttons above to record round results.";
-            return;
-        }
+    let csv = "Round,Number,Category,Color\n";
 
-        const recentLosses = history.slice(-3).filter(h => h.status === 'LOSS').length;
-        let note = "";
+    history.forEach((n, i) => {
+        csv += `${i+1},${n},${getCategory(n)},${getColor(n)}\n`;
+    });
 
-        if (recentLosses >= 2) {
-            note = "⚠️ High volatility (Multiple Losses). Wait 1-2 rounds.";
-        } else {
-            const categories = history.map(h => h.category);
-            const last = categories[categories.length - 1];
-            let streakCount = 0;
-            
-            for (let i = categories.length - 1; i >= 0; i--) {
-                if (categories[i] === last) streakCount++;
-                else break;
-            }
+    const blob = new Blob([csv], {
+        type: "text/csv;charset=utf-8;"
+    });
 
-            if (streakCount >= 3) {
-                note = `🔥 Strong Trend (${streakCount}x ${last}): Following continuous pattern.`;
-            } else {
-                note = "✅ Normal Pattern: Using frequency & ABAB evaluation.";
-            }
-        }
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
 
-        document.getElementById('streak').innerText = `${history[history.length - 1].category}`;
-        textElem.innerText = note;
-    }
+    link.href = url;
+    link.download = "game-history.csv";
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+
+loadData();
+createPad();
+updateUI();
 </script>
-
 </body>
 </html>
