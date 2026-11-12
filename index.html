@@ -3,469 +3,583 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pro Pattern Analyzer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Pattern & Loss Analyzer</title>
 
 <style>
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
 body {
     background: #090d16;
     color: #fff;
-    padding: 15px;
+    padding: 10px;
+    text-align: center;
 }
 
 .container {
     max-width: 900px;
+    width: 100%;
     margin: auto;
-}
-
-.header {
-    text-align: center;
-    padding: 25px 10px;
-}
-
-.header h1 {
-    color: #00f5a0;
-    font-size: 27px;
-    letter-spacing: 1px;
-}
-
-.header p {
-    color: #8c9bad;
-    margin-top: 8px;
-    font-size: 13px;
-}
-
-.panel {
     background: #141c2b;
-    border: 1px solid #263449;
-    border-radius: 14px;
-    padding: 17px;
-    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.5);
 }
 
-.panel h2 {
-    font-size: 15px;
-    color: #00f5a0;
+h1 {
+    color: #00e676;
+    margin-bottom: 5px;
+    font-size: 23px;
+}
+
+.subtitle {
+    color: #bbb;
+    font-size: 12px;
+    margin-bottom: 18px;
+}
+
+.section {
+    background: #1e293b;
+    border: 1px solid #304057;
+    border-radius: 10px;
+    padding: 14px;
     margin-bottom: 15px;
+    text-align: left;
+}
+
+.section h2 {
+    color: #00e676;
+    font-size: 14px;
+    margin-bottom: 13px;
 }
 
 .number-pad {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(5,1fr);
+    gap: 8px;
 }
 
 .num-btn {
-    border: none;
-    padding: 17px 5px;
-    border-radius: 10px;
-    font-size: 21px;
+    padding: 15px 0;
+    font-size: 19px;
     font-weight: bold;
-    color: white;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
-    transition: .2s;
-}
-
-.num-btn:hover {
-    filter: brightness(1.25);
-    transform: translateY(-2px);
+    color: white;
+    transition: .15s;
 }
 
 .num-btn:active {
-    transform: scale(.94);
+    transform: scale(.92);
 }
 
-.red { background: #e53950; }
-.green { background: #16a66a; }
-.violet { background: #883cce; }
+.red { background: #e53935; }
+.green { background: #43a047; }
+.violet { background: #8e24aa; }
 
-.dashboard {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-}
+/* Prediction card */
 
-.stat {
-    background: #1b2638;
-    border: 1px solid #293b52;
-    padding: 16px;
+.prediction-card {
+    background: #202d40;
+    border: 2px solid #00e676;
     border-radius: 12px;
+    padding: 20px 10px;
+    margin-bottom: 15px;
+    text-align: center;
 }
 
-.stat h3 {
-    color: #9aabc0;
-    font-size: 11px;
-    margin-bottom: 9px;
+.prediction-card h2 {
+    font-size: 12px;
+    color: #aab8c9;
+    margin-bottom: 10px;
 }
 
-.value {
-    font-size: 25px;
+.prediction-value {
+    font-size: 32px;
     font-weight: bold;
 }
 
-.green-text { color: #00e89a; }
-.blue-text { color: #36baff; }
-.orange-text { color: #ffae42; }
-.red-text { color: #ff5265; }
+.pred-big { color: #ff9800; }
+.pred-small { color: #29b6f6; }
+
+.prediction-reason {
+    color: #aab8c9;
+    font-size: 11px;
+    margin-top: 8px;
+}
+
+/* Dashboard */
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 10px;
+}
+
+.card {
+    background: #263449;
+    padding: 13px;
+    border-radius: 8px;
+    border: 1px solid #394b62;
+    text-align: center;
+}
+
+.card h3 {
+    font-size: 10px;
+    color: #aab8c9;
+    margin-bottom: 7px;
+}
+
+.val {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.orange { color: #ff9800; }
+.blue { color: #29b6f6; }
+.green-text { color: #4caf50; }
+.red-text { color: #f44336; }
+
+/* Distribution */
 
 .bar-bg {
-    height: 11px;
-    background: #293448;
+    height: 13px;
+    background: #344054;
     border-radius: 20px;
-    overflow: hidden;
     display: flex;
+    overflow: hidden;
     margin: 12px 0;
 }
 
-.bar-big {
-    background: #ff9e35;
+.big-bar {
+    background: #ff9800;
     width: 0%;
     transition: .3s;
 }
 
-.bar-small {
+.small-bar {
     background: #29b6f6;
     width: 0%;
     transition: .3s;
 }
 
 .detail {
-    color: #b5c2d2;
+    color: #b8c5d6;
     font-size: 12px;
-    line-height: 1.8;
 }
 
-.pattern-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
+/* Analysis */
 
-.pattern {
+.analysis-box {
+    background: #202d40;
     padding: 13px;
-    border-radius: 10px;
-    background: #202d40;
+    border-left: 4px solid #00e676;
+    border-radius: 7px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #d2deeb;
 }
 
-.pattern span {
-    display: block;
-    font-size: 11px;
-    color: #94a5bb;
-    margin-bottom: 7px;
+.analysis-box.warning {
+    border-left-color: #ff4444;
+    color: #ff7777;
 }
 
-.pattern strong {
-    font-size: 18px;
+.analysis-box.caution {
+    border-left-color: #ff9800;
+    color: #ffc36b;
 }
 
-.actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 9px;
-    margin-top: 15px;
-}
+/* History */
 
-.action-btn {
-    flex: 1;
-    min-width: 100px;
-    border: none;
+.table-container {
+    max-height: 300px;
+    overflow-y: auto;
     border-radius: 8px;
-    padding: 12px;
-    font-weight: bold;
-    color: white;
-    cursor: pointer;
-    background: #34445d;
-}
-
-.action-btn:hover {
-    filter: brightness(1.2);
-}
-
-.export { background: #087e59; }
-.undo { background: #b77b22; }
-.reset { background: #b83248; }
-
-.filters {
-    width: 100%;
-    padding: 10px;
-    background: #202d40;
-    color: white;
-    border: 1px solid #40516a;
-    border-radius: 8px;
-    margin-bottom: 12px;
-}
-
-.table-wrap {
-    overflow-x: auto;
-    max-height: 350px;
-    border: 1px solid #304057;
-    border-radius: 9px;
+    border: 1px solid #394b62;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     font-size: 12px;
-    min-width: 380px;
 }
 
-th, td {
-    padding: 12px 8px;
+th,td {
+    padding: 10px 5px;
+    border-bottom: 1px solid #394b62;
     text-align: center;
-    border-bottom: 1px solid #2b3a50;
 }
 
 th {
+    background: #263449;
+    color: #aab8c9;
     position: sticky;
     top: 0;
-    background: #26354b;
-    color: #9caec5;
 }
 
-.tag-big {
-    color: #ffae42;
+.tag-big { color: #ff9800; font-weight: bold; }
+.tag-small { color: #29b6f6; font-weight: bold; }
+.win { color: #4caf50; font-weight: bold; }
+.loss { color: #f44336; font-weight: bold; }
+
+/* Controls */
+
+.controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.control-btn {
+    flex: 1;
+    min-width: 90px;
+    padding: 11px;
+    border: none;
+    border-radius: 7px;
+    color: white;
     font-weight: bold;
+    cursor: pointer;
 }
 
-.tag-small {
-    color: #36baff;
-    font-weight: bold;
+.undo { background: #b7791f; }
+.reset { background: #c0392b; }
+.export { background: #087e59; }
+
+select {
+    width: 100%;
+    padding: 10px;
+    background: #263449;
+    color: white;
+    border: 1px solid #40516a;
+    border-radius: 7px;
+    margin-bottom: 10px;
 }
 
-.footer {
-    text-align: center;
-    color: #697b91;
+.note {
+    color: #9eafc4;
     font-size: 11px;
-    padding: 20px;
-}
-
-.notice {
-    color: #c4d1e0;
-    font-size: 12px;
     line-height: 1.6;
 }
 
 @media(max-width:450px) {
-    body { padding: 9px; }
-    .header h1 { font-size: 22px; }
-    .panel { padding: 13px; }
-    .num-btn { padding: 14px 3px; }
-    .value { font-size: 21px; }
+    body { padding: 7px; }
+    .container { padding: 10px; }
+    h1 { font-size: 20px; }
+    .val { font-size: 19px; }
 }
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
-<header class="header">
-    <h1>⚡ PRO PATTERN ANALYZER</h1>
-    <p>Game History & Statistical Dashboard</p>
-</header>
+<h1>⚡ PATTERN & LOSS ANALYZER</h1>
+<p class="subtitle">Live Statistics • Trend Analysis • Risk Monitor</p>
 
-<section class="panel">
-    <h2>NUMBER INPUT</h2>
+<!-- NUMBER PAD -->
+
+<div class="section">
+    <h2>ENTER GAME RESULT</h2>
     <div class="number-pad" id="numberPad"></div>
 
-    <div class="actions">
-        <button class="action-btn undo" onclick="undoLast()">↶ Undo</button>
-        <button class="action-btn reset" onclick="resetData()">Reset All</button>
-        <button class="action-btn export" onclick="exportCSV()">↓ Export CSV</button>
+    <div class="controls">
+        <button class="control-btn undo" onclick="undoLast()">↶ Undo</button>
+        <button class="control-btn reset" onclick="resetAll()">Reset</button>
+        <button class="control-btn export" onclick="exportCSV()">Export CSV</button>
     </div>
-</section>
+</div>
 
-<section class="panel">
+<!-- NEXT PREDICTION -->
+
+<div class="prediction-card">
+    <h2>NEXT ROUND TREND ESTIMATE</h2>
+    <div id="prediction" class="prediction-value">WAITING</div>
+    <div id="predictionReason" class="prediction-reason">
+        Enter results to calculate historical trend.
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+
+<div class="section">
     <h2>LIVE DASHBOARD</h2>
+
     <div class="dashboard">
 
-        <div class="stat">
+        <div class="card">
             <h3>TOTAL ROUNDS</h3>
-            <div class="value green-text" id="total">0</div>
+            <div class="val" id="total">0</div>
         </div>
 
-        <div class="stat">
+        <div class="card">
+            <h3>TOTAL WINS</h3>
+            <div class="val green-text" id="wins">0</div>
+        </div>
+
+        <div class="card">
+            <h3>TOTAL LOSSES</h3>
+            <div class="val red-text" id="losses">0</div>
+        </div>
+
+        <div class="card">
+            <h3>WIN ACCURACY</h3>
+            <div class="val orange" id="accuracy">0%</div>
+        </div>
+
+        <div class="card">
             <h3>BIG RESULTS</h3>
-            <div class="value orange-text" id="bigCount">0</div>
+            <div class="val orange" id="bigCount">0</div>
         </div>
 
-        <div class="stat">
+        <div class="card">
             <h3>SMALL RESULTS</h3>
-            <div class="value blue-text" id="smallCount">0</div>
-        </div>
-
-        <div class="stat">
-            <h3>LAST RESULT</h3>
-            <div class="value" id="lastResult">-</div>
+            <div class="val blue" id="smallCount">0</div>
         </div>
 
     </div>
-</section>
+</div>
 
-<section class="panel">
+<!-- DISTRIBUTION -->
+
+<div class="section">
     <h2>BIG / SMALL DISTRIBUTION</h2>
 
     <div class="bar-bg">
-        <div class="bar-big" id="bigBar"></div>
-        <div class="bar-small" id="smallBar"></div>
+        <div class="big-bar" id="bigBar"></div>
+        <div class="small-bar" id="smallBar"></div>
     </div>
 
     <div class="detail" id="distribution">
         BIG: 0% | SMALL: 0%
     </div>
-</section>
+</div>
 
-<section class="panel">
-    <h2>PATTERN ANALYSIS</h2>
+<!-- ANALYSIS -->
 
-    <div class="pattern-grid">
+<div class="section">
+    <h2>VOLATILITY & RISK ANALYSIS</h2>
 
-        <div class="pattern">
-            <span>CURRENT STREAK</span>
-            <strong id="streak">-</strong>
-        </div>
-
-        <div class="pattern">
-            <span>LONGEST STREAK</span>
-            <strong id="longest">0</strong>
-        </div>
-
-        <div class="pattern">
-            <span>ALTERNATING PATTERN</span>
-            <strong id="alternating">-</strong>
-        </div>
-
-        <div class="pattern">
-            <span>REPEATED RESULTS</span>
-            <strong id="repeats">0</strong>
-        </div>
-
-        <div class="pattern">
-            <span>BIG IN LAST 10</span>
-            <strong id="recentBig">0</strong>
-        </div>
-
-        <div class="pattern">
-            <span>SMALL IN LAST 10</span>
-            <strong id="recentSmall">0</strong>
-        </div>
-
+    <div class="analysis-box" id="analysis">
+        Waiting for game results...
     </div>
 
-    <p class="detail" id="analysis" style="margin-top:15px">
-        Add results to begin statistical analysis.
-    </p>
-</section>
+    <div class="detail" style="margin-top:12px">
+        Current Loss Streak:
+        <strong id="lossStreak">0</strong>
+        <br>
+        Current Result Streak:
+        <strong id="resultStreak">-</strong>
+        <br>
+        Recent Alternation:
+        <strong id="alternation">-</strong>
+    </div>
+</div>
 
-<section class="panel">
+<!-- HISTORY -->
+
+<div class="section">
     <h2>ROUND HISTORY</h2>
 
-    <select class="filters" id="filter" onchange="updateTable()">
-        <option value="all">All Results</option>
+    <select id="filter" onchange="updateHistory()">
+        <option value="all">All Rounds</option>
         <option value="10">Last 10 Rounds</option>
         <option value="20">Last 20 Rounds</option>
         <option value="50">Last 50 Rounds</option>
     </select>
 
-    <div class="table-wrap">
+    <div class="table-container">
         <table>
             <thead>
                 <tr>
                     <th>ROUND</th>
                     <th>NUMBER</th>
                     <th>CATEGORY</th>
-                    <th>COLOR</th>
+                    <th>PREDICTION</th>
+                    <th>STATUS</th>
                 </tr>
             </thead>
             <tbody id="historyTable"></tbody>
         </table>
     </div>
-</section>
+</div>
 
-<section class="panel">
-    <h2>ABOUT ANALYSIS</h2>
-    <p class="notice">
-        This dashboard records historical results and calculates
-        descriptive statistics. BIG means 5–9 and SMALL means 0–4.
-        Historical patterns do not establish what the next random
-        result will be. Percentages describe recorded data only.
+<div class="section">
+    <p class="note">
+        Predictions are estimates based on historical trends only.
+        Random game results cannot be reliably predicted.
+        Accuracy measures past predictions and does not guarantee
+        future results. Avoid betting based on these estimates.
     </p>
-</section>
-
-<footer class="footer">
-    PRO PATTERN ANALYZER • LOCAL DATA STORAGE
-</footer>
+</div>
 
 </div>
 
 <script>
+"use strict";
+
 let history = [];
 
-const colors = [
-    "Violet", "Green", "Red", "Green", "Red",
-    "Violet", "Red", "Green", "Red", "Green"
+const COLORS = [
+    "Violet","Green","Red","Green","Red",
+    "Violet","Red","Green","Red","Green"
 ];
 
-function getCategory(n) {
+function category(n) {
     return n <= 4 ? "SMALL" : "BIG";
 }
 
-function getColor(n) {
-    return colors[n];
-}
+function getPrediction() {
+    const cats = history.map(x => category(x.number));
+    const len = cats.length;
 
-function saveData() {
-    try {
-        localStorage.setItem(
-            "proAnalyzerHistory",
-            JSON.stringify(history)
-        );
-    } catch(e) {
-        console.warn("Could not save data", e);
+    if(len < 3) {
+        return {
+            value: null,
+            reason: "Need at least 3 results for trend analysis."
+        };
     }
+
+    const last = cats[len - 1];
+    const previous = cats[len - 2];
+    const third = cats[len - 3];
+
+    // Continuous streak: flag the observed trend
+    if(last === previous && previous === third) {
+        return {
+            value: last,
+            reason: "Three consecutive identical categories observed."
+        };
+    }
+
+    // Alternating pattern
+    const recent4 = cats.slice(-4);
+
+    if(recent4.length === 4 &&
+       recent4[0] === recent4[2] &&
+       recent4[1] === recent4[3] &&
+       recent4[0] !== recent4[1]) {
+        return {
+            value: last === "BIG" ? "SMALL" : "BIG",
+            reason: "Alternating ABAB pattern detected."
+        };
+    }
+
+    // Last 10 rounds frequency
+    const recent = cats.slice(-10);
+    const big = recent.filter(x => x === "BIG").length;
+    const small = recent.length - big;
+
+    if(big > small) {
+        return {
+            value: "BIG",
+            reason: "BIG occurred more often in recent results."
+        };
+    }
+
+    if(small > big) {
+        return {
+            value: "SMALL",
+            reason: "SMALL occurred more often in recent results."
+        };
+    }
+
+    return {
+        value: last === "BIG" ? "SMALL" : "BIG",
+        reason: "Recent frequencies are equal; opposite category shown as a reference."
+    };
 }
 
-function loadData() {
-    try {
-        const saved = localStorage.getItem("proAnalyzerHistory");
-        const parsed = saved ? JSON.parse(saved) : [];
+// Recalculate every prediction from the complete history.
+// This keeps undo and reset statistics consistent.
+function calculateHistory() {
+    let wins = 0;
+    let losses = 0;
+    let lossStreak = 0;
+    let maxLossStreak = 0;
 
-        if (Array.isArray(parsed) &&
-            parsed.every(x => Number.isInteger(x) &&
-            x >= 0 && x <= 9)) {
-            history = parsed;
+    const rows = [];
+    const outcomes = [];
+
+    history.forEach((item, index) => {
+        const prediction = getPredictionForHistory(rows);
+
+        let status = "N/A";
+
+        if(prediction) {
+            if(prediction === item.category) {
+                status = "WIN";
+                wins++;
+                lossStreak = 0;
+            } else {
+                status = "LOSS";
+                losses++;
+                lossStreak++;
+                maxLossStreak = Math.max(maxLossStreak, lossStreak);
+            }
         }
-    } catch(e) {
-        history = [];
-    }
+
+        rows.push({
+            round: index + 1,
+            number: item.number,
+            category: item.category,
+            prediction: prediction || "WAITING",
+            status: status
+        });
+
+        outcomes.push(status);
+    });
+
+    return { rows, wins, losses, lossStreak, maxLossStreak };
 }
 
-function createPad() {
-    const pad = document.getElementById("numberPad");
+function getPredictionForHistory(rows) {
+    if(rows.length < 2) return null;
 
-    for(let i = 0; i <= 9; i++) {
-        const btn = document.createElement("button");
-        btn.className = "num-btn " +
-            (i === 0 || i === 5 ? "violet" :
-            (i === 1 || i === 3 || i === 7 || i === 9 ?
-            "green" : "red"));
+    const cats = rows.map(x => x.category);
+    const len = cats.length;
 
-        btn.textContent = i;
-        btn.addEventListener("click", () => addRound(i));
-        pad.appendChild(btn);
+    const last = cats[len-1];
+    const previous = cats[len-2];
+    const third = len >= 3 ? cats[len-3] : null;
+
+    if(last === previous && previous === third) return last;
+
+    const recent4 = cats.slice(-4);
+
+    if(recent4.length === 4 &&
+       recent4[0] === recent4[2] &&
+       recent4[1] === recent4[3] &&
+       recent4[0] !== recent4[1]) {
+        return last === "BIG" ? "SMALL" : "BIG";
     }
+
+    const recent = cats.slice(-10);
+    const big = recent.filter(x => x === "BIG").length;
+    const small = recent.length - big;
+
+    if(big > small) return "BIG";
+    if(small > big) return "SMALL";
+
+    return last === "BIG" ? "SMALL" : "BIG";
 }
 
-function addRound(n) {
-    history.push(n);
+function addRound(number) {
+    history.push({
+        number: number,
+        category: category(number)
+    });
+
     saveData();
-    updateUI();
+    render();
 }
 
 function undoLast() {
@@ -473,88 +587,75 @@ function undoLast() {
 
     history.pop();
     saveData();
-    updateUI();
+    render();
 }
 
-function resetData() {
-    if(!confirm("Are you sure you want to clear all history?"))
-        return;
+function resetAll() {
+    if(!confirm("Clear all game history?")) return;
 
     history = [];
     saveData();
-    updateUI();
+    render();
 }
 
-function percentage(value, total) {
-    return total ? ((value / total) * 100).toFixed(1) : "0.0";
+function saveData() {
+    try {
+        localStorage.setItem(
+            "patternAnalyzerHistory",
+            JSON.stringify(history)
+        );
+    } catch(e) {
+        console.warn("Storage unavailable", e);
+    }
 }
 
-function calculateStats() {
-    const categories = history.map(getCategory);
+function loadData() {
+    try {
+        const data = JSON.parse(
+            localStorage.getItem("patternAnalyzerHistory") || "[]"
+        );
+
+        if(Array.isArray(data) &&
+           data.every(x => x &&
+           Number.isInteger(x.number) &&
+           x.number >= 0 && x.number <= 9)) {
+            history = data.map(x => ({
+                number: x.number,
+                category: category(x.number)
+            }));
+        }
+    } catch(e) {
+        history = [];
+    }
+}
+
+function render() {
+    const stats = calculateHistory();
     const total = history.length;
 
-    const big = categories.filter(x => x === "BIG").length;
+    const big = history.filter(x =>
+        x.category === "BIG"
+    ).length;
+
     const small = total - big;
 
-    let streak = 0;
-    let longest = 0;
-    let repeats = 0;
-    let current = null;
-    let previous = null;
+    document.getElementById("total").textContent = total;
+    document.getElementById("wins").textContent = stats.wins;
+    document.getElementById("losses").textContent = stats.losses;
+    document.getElementById("bigCount").textContent = big;
+    document.getElementById("smallCount").textContent = small;
 
-    for(let i = 0; i < total; i++) {
-        const cat = categories[i];
+    const evaluated = stats.wins + stats.losses;
 
-        if(cat === current) {
-            streak++;
-        } else {
-            current = cat;
-            streak = 1;
-        }
+    const accuracy = evaluated
+        ? (stats.wins / evaluated * 100).toFixed(1)
+        : "0.0";
 
-        longest = Math.max(longest, streak);
+    document.getElementById("accuracy").textContent =
+        accuracy + "%";
 
-        if(cat === previous) repeats++;
-        previous = cat;
-    }
-
-    const recent = categories.slice(-10);
-    const recentBig = recent.filter(x => x === "BIG").length;
-    const recentSmall = recent.length - recentBig;
-
-    let alternating = 0;
-
-    for(let i = Math.max(1, total - 5); i < total; i++) {
-        if(categories[i] !== categories[i-1]) alternating++;
-    }
-
-    return {
-        total, big, small, categories,
-        streak, longest, repeats,
-        recentBig, recentSmall,
-        alternating
-    };
-}
-
-function updateUI() {
-    const s = calculateStats();
-
-    document.getElementById("total").textContent = s.total;
-    document.getElementById("bigCount").textContent = s.big;
-    document.getElementById("smallCount").textContent = s.small;
-
-    const last = history.length
-        ? getCategory(history[history.length - 1])
-        : "-";
-
-    const lastElement = document.getElementById("lastResult");
-    lastElement.textContent = last;
-    lastElement.className = "value " +
-        (last === "BIG" ? "orange-text" :
-        last === "SMALL" ? "blue-text" : "");
-
-    const bigPercent = Number(percentage(s.big, s.total));
-    const smallPercent = Number(percentage(s.small, s.total));
+    const bigPercent = total ? big / total * 100 : 0;
+    const smallPercent = total ? small / total * 100 : 0;
 
     document.getElementById("bigBar").style.width =
         bigPercent + "%";
@@ -563,71 +664,110 @@ function updateUI() {
         smallPercent + "%";
 
     document.getElementById("distribution").textContent =
-        `BIG: ${bigPercent}% (${s.big}) | ` +
-        `SMALL: ${smallPercent}% (${s.small})`;
+        `BIG: ${bigPercent.toFixed(1)}% (${big}) | SMALL: ${smallPercent.toFixed(1)}% (${small})`;
 
-    document.getElementById("streak").textContent =
-        s.total ? `${last} × ${s.streak}` : "-";
+    // Next trend estimate
+    const pred = getPrediction();
+    const predElement = document.getElementById("prediction");
 
-    document.getElementById("longest").textContent =
-        s.longest;
+    predElement.textContent = pred.value || "WAITING";
+    predElement.className = "prediction-value " +
+        (pred.value === "BIG" ? "pred-big" :
+        pred.value === "SMALL" ? "pred-small" : "");
 
-    document.getElementById("alternating").textContent =
-        s.total < 3 ? "-" :
-        s.alternating >= 4 ? "Strong ABAB" :
-        s.alternating >= 2 ? "Partial" : "No pattern";
+    document.getElementById("predictionReason").textContent =
+        pred.reason;
 
-    document.getElementById("repeats").textContent =
-        s.repeats;
+    // Result streak
+    let resultStreak = 0;
+    let currentCategory = null;
 
-    document.getElementById("recentBig").textContent =
-        s.recentBig;
-
-    document.getElementById("recentSmall").textContent =
-        s.recentSmall;
-
-    let note = "Add more rounds for statistical analysis.";
-
-    if(s.total >= 3) {
-        if(s.streak >= 3) {
-            note = `A ${s.streak}-round ${last} streak is present in the recorded history.`;
-        } else if(s.alternating >= 4) {
-            note = "The last several results show an alternating pattern.";
+    for(let i = total - 1; i >= 0; i--) {
+        if(currentCategory === null) {
+            currentCategory = history[i].category;
+            resultStreak = 1;
+        } else if(history[i].category === currentCategory) {
+            resultStreak++;
         } else {
-            note = "No strong descriptive pattern detected in the recent results.";
+            break;
         }
     }
 
-    document.getElementById("analysis").textContent =
-        note;
+    document.getElementById("resultStreak").textContent =
+        total ? currentCategory + " × " + resultStreak : "-";
 
-    updateTable();
+    document.getElementById("lossStreak").textContent =
+        stats.lossStreak;
+
+    // Alternation detection
+    const recent = history.slice(-5).map(x => x.category);
+    let alternating = recent.length >= 4;
+
+    for(let i = 1; i < recent.length; i++) {
+        if(recent[i] === recent[i-1]) {
+            alternating = false;
+            break;
+        }
+    }
+
+    document.getElementById("alternation").textContent =
+        alternating ? "Detected" : "Not detected";
+
+    // Risk analysis
+    const analysis = document.getElementById("analysis");
+
+    const recentLosses = stats.rows.slice(-3)
+        .filter(x => x.status === "LOSS").length;
+
+    const recentCats = history.slice(-6)
+        .map(x => x.category);
+
+    const bigRecent = recentCats.filter(x => x === "BIG").length;
+    const smallRecent = recentCats.length - bigRecent;
+
+    const highVariation = recentCats.length >= 6 &&
+        bigRecent >= 2 && smallRecent >= 2;
+
+    if(stats.lossStreak >= 3) {
+        analysis.className = "analysis-box warning";
+        analysis.textContent =
+            "⚠️ HIGH RISK: 3 or more consecutive prediction losses. Predictions are unreliable. Consider stopping and reviewing your results.";
+    } else if(recentLosses >= 2 || highVariation) {
+        analysis.className = "analysis-box caution";
+        analysis.textContent =
+            "⚠️ CAUTION: Recent outcomes show inconsistent results. Historical patterns may not continue.";
+    } else {
+        analysis.className = "analysis-box";
+        analysis.textContent = total < 3
+            ? "Enter at least 3 rounds to start trend analysis."
+            : "✅ No high-risk warning detected in the recorded prediction history. This does not mean the next result is safe or predictable.";
+    }
+
+    updateHistory();
 }
 
-function updateTable() {
+function updateHistory() {
     const tbody = document.getElementById("historyTable");
     tbody.innerHTML = "";
 
+    const stats = calculateHistory();
     const filter = document.getElementById("filter").value;
 
-    let entries = history.map((n, i) => ({
-        number: n,
-        round: i + 1
-    }));
+    let rows = stats.rows;
 
     if(filter !== "all") {
-        entries = entries.slice(-Number(filter));
+        rows = rows.slice(-Number(filter));
     }
 
-    entries.reverse().forEach(row => {
-        const cat = getCategory(row.number);
+    rows.slice().reverse().forEach(row => {
         const tr = document.createElement("tr");
 
         const values = [
             "#" + row.round,
             row.number,
-            cat,
-            getColor(row.number)
+            row.category,
+            row.prediction,
+            row.status
         ];
 
         values.forEach((value, i) => {
@@ -635,8 +775,14 @@ function updateTable() {
             td.textContent = value;
 
             if(i === 2) {
-                td.className = cat === "BIG"
+                td.className = row.category === "BIG"
                     ? "tag-big" : "tag-small";
+            }
+
+            if(i === 4) {
+                td.className = row.status === "WIN"
+                    ? "win" : row.status === "LOSS"
+                    ? "loss" : "";
             }
 
             tr.appendChild(td);
@@ -648,33 +794,50 @@ function updateTable() {
 
 function exportCSV() {
     if(!history.length) {
-        alert("No history available to export.");
+        alert("No history available.");
         return;
     }
 
-    let csv = "Round,Number,Category,Color\n";
+    const rows = calculateHistory().rows;
 
-    history.forEach((n, i) => {
-        csv += `${i+1},${n},${getCategory(n)},${getColor(n)}\n`;
+    let csv = "Round,Number,Category,Prediction,Status\n";
+
+    rows.forEach(row => {
+        csv += `${row.round},${row.number},${row.category},${row.prediction},${row.status}\n`;
     });
 
     const blob = new Blob([csv], {
-        type: "text/csv;charset=utf-8;"
+        type: "text/csv;charset=utf-8"
     });
 
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
     link.href = url;
-    link.download = "game-history.csv";
+    link.download = "pattern-history.csv";
     link.click();
 
     URL.revokeObjectURL(url);
 }
 
+// Initialize
+const pad = document.getElementById("numberPad");
+
+for(let i = 0; i <= 9; i++) {
+    const button = document.createElement("button");
+
+    button.textContent = i;
+    button.className = "num-btn " +
+        (i === 0 || i === 5 ? "violet" :
+        [1,3,7,9].includes(i) ? "green" : "red");
+
+    button.addEventListener("click", () => addRound(i));
+    pad.appendChild(button);
+}
+
 loadData();
-createPad();
-updateUI();
+render();
+
 </script>
 </body>
 </html>
