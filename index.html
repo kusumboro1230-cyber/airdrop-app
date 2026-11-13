@@ -1,843 +1,1425 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Game Pattern & Loss Analyzer</title>
+<meta name="theme-color" content="#090e19">
+<title>51Game Pattern & Trend Analyzer</title>
 
 <style>
+:root {
+  --bg:#090e19;
+  --panel:#121c2b;
+  --line:#2b3b52;
+  --muted:#91a2b8;
+  --text:#edf4ff;
+  --green:#00e6a0;
+  --blue:#35b8ff;
+  --orange:#ffad42;
+  --red:#ff5b6e;
+  --violet:#ad78ff;
+}
+
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Inter,"Segoe UI",Arial,sans-serif;
 }
 
 body {
-    background: #090d16;
-    color: #fff;
-    padding: 10px;
-    text-align: center;
+  background:radial-gradient(ellipse at top,#14243a 0%,var(--bg) 48%);
+  color:var(--text);
+  padding:16px;
+  min-height:100vh;
 }
 
-.container {
-    max-width: 900px;
-    width: 100%;
-    margin: auto;
-    background: #141c2b;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,.5);
+button,input,select { font:inherit; }
+button { cursor:pointer; }
+
+.app {
+  max-width:1180px;
+  margin:0 auto;
 }
 
-h1 {
-    color: #00e676;
-    margin-bottom: 5px;
-    font-size: 23px;
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  padding:8px 2px 18px;
 }
 
-.subtitle {
-    color: #bbb;
-    font-size: 12px;
-    margin-bottom: 18px;
+.brand h1 {
+  font-size:clamp(20px,3vw,28px);
+  letter-spacing:.5px;
+  color:var(--green);
 }
 
-.section {
-    background: #1e293b;
-    border: 1px solid #304057;
-    border-radius: 10px;
-    padding: 14px;
-    margin-bottom: 15px;
-    text-align: left;
+.brand p {
+  color:var(--muted);
+  font-size:12px;
+  margin-top:4px;
 }
 
-.section h2 {
-    color: #00e676;
-    font-size: 14px;
-    margin-bottom: 13px;
+.live-pill {
+  border:1px solid #176b56;
+  background:#0d3029;
+  color:#6df2c4;
+  border-radius:99px;
+  padding:7px 12px;
+  font-size:11px;
+  white-space:nowrap;
 }
 
+.panel {
+  background:linear-gradient(145deg,rgba(24,37,56,.97),rgba(16,25,39,.97));
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 10px 30px #0002;
+}
+
+.panel-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.panel h2 {
+  color:var(--green);
+  font-size:13px;
+  letter-spacing:.7px;
+  text-transform:uppercase;
+}
+
+.subtle {
+  color:var(--muted);
+  font-size:11px;
+}
+
+/* NEXT SIGNAL HERO BOX */
+.signal-hero {
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:14px;
+  align-items:center;
+  background:linear-gradient(135deg,#13283d,#0d1929);
+  border:1px solid #2b4c6f;
+  border-radius:13px;
+  padding:16px;
+}
+
+.signal-main {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.signal-tag {
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.signal-value {
+  font-size:clamp(32px,5vw,44px);
+  font-weight:900;
+  letter-spacing:1px;
+  line-height:1.1;
+}
+
+.signal-value.BIG { color:var(--orange); text-shadow:0 0 20px rgba(255,173,66,0.35); }
+.signal-value.SMALL { color:var(--blue); text-shadow:0 0 20px rgba(53,184,255,0.35); }
+.signal-value.WAIT { color:var(--violet); }
+
+.signal-reason {
+  font-size:12px;
+  color:#d3e1f2;
+  margin-top:2px;
+}
+
+.signal-meta {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.meta-box {
+  background:#0a1320;
+  border:1px solid #24364e;
+  border-radius:9px;
+  padding:10px;
+}
+
+.meta-box span {
+  display:block;
+  font-size:10px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+
+.meta-box strong {
+  font-size:15px;
+}
+
+/* NUMBER PAD */
 .number-pad {
-    display: grid;
-    grid-template-columns: repeat(5,1fr);
-    gap: 8px;
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  gap:8px;
 }
 
 .num-btn {
-    padding: 15px 0;
-    font-size: 19px;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    color: white;
-    transition: .15s;
+  border:1px solid #ffffff1a;
+  color:#fff;
+  border-radius:10px;
+  padding:14px 5px;
+  font-size:18px;
+  font-weight:800;
+  background:#34445d;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  transition:transform .1s, filter .15s;
 }
 
-.num-btn:active {
-    transform: scale(.92);
+.num-btn small {
+  font-size:9px;
+  font-weight:600;
+  opacity:0.85;
 }
 
-.red { background: #e53935; }
-.green { background: #43a047; }
-.violet { background: #8e24aa; }
+.num-btn.green { background:#167c58; }
+.num-btn.red { background:#a93648; }
+.num-btn.violet { background:#7040a4; }
+.num-btn:hover { filter:brightness(1.12); }
+.num-btn:active { transform:scale(.93); }
 
-/* Prediction card */
-
-.prediction-card {
-    background: #202d40;
-    border: 2px solid #00e676;
-    border-radius: 12px;
-    padding: 20px 10px;
-    margin-bottom: 15px;
-    text-align: center;
+.pad-actions {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:10px;
+  gap:10px;
+  flex-wrap:wrap;
 }
 
-.prediction-card h2 {
-    font-size: 12px;
-    color: #aab8c9;
-    margin-bottom: 10px;
+/* MANUAL FORM */
+.input-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1.4fr auto;
+  gap:10px;
+  align-items:end;
 }
 
-.prediction-value {
-    font-size: 32px;
-    font-weight: bold;
+.field label {
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin:0 0 6px 2px;
 }
 
-.pred-big { color: #ff9800; }
-.pred-small { color: #29b6f6; }
-
-.prediction-reason {
-    color: #aab8c9;
-    font-size: 11px;
-    margin-top: 8px;
+.field input,
+.field select,
+.toolbar select,
+.toolbar input {
+  width:100%;
+  background:#0d1726;
+  color:var(--text);
+  border:1px solid #35465f;
+  border-radius:8px;
+  padding:10px;
+  outline:none;
+  min-width:0;
 }
 
-/* Dashboard */
-
-.dashboard {
-    display: grid;
-    grid-template-columns: repeat(2,1fr);
-    gap: 10px;
+.field input:focus,
+.field select:focus,
+.toolbar input:focus,
+.toolbar select:focus {
+  border-color:var(--green);
 }
 
-.card {
-    background: #263449;
-    padding: 13px;
-    border-radius: 8px;
-    border: 1px solid #394b62;
-    text-align: center;
+.btn {
+  border:0;
+  border-radius:8px;
+  padding:10px 14px;
+  font-weight:700;
+  color:#07150f;
+  background:var(--green);
+  transition:.15s;
 }
 
-.card h3 {
-    font-size: 10px;
-    color: #aab8c9;
-    margin-bottom: 7px;
+.btn:hover { filter:brightness(1.1); }
+.btn.secondary { color:var(--text); background:#30435d; }
+.btn.danger { color:#fff; background:#a93648; }
+.btn.blue { color:#061522; background:var(--blue); }
+.btn.orange { color:#201405; background:var(--orange); }
+.btn.small { padding:7px 11px; font-size:11px; }
+
+.form-error {
+  color:#ff8995;
+  font-size:11px;
+  min-height:16px;
+  margin-top:6px;
 }
 
-.val {
-    font-size: 22px;
-    font-weight: bold;
+.stats-grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
 }
 
-.orange { color: #ff9800; }
-.blue { color: #29b6f6; }
-.green-text { color: #4caf50; }
-.red-text { color: #f44336; }
-
-/* Distribution */
-
-.bar-bg {
-    height: 13px;
-    background: #344054;
-    border-radius: 20px;
-    display: flex;
-    overflow: hidden;
-    margin: 12px 0;
+.stat {
+  background:linear-gradient(145deg,#202f45,#172337);
+  border:1px solid #30435b;
+  border-radius:11px;
+  padding:13px;
+  min-width:0;
 }
 
-.big-bar {
-    background: #ff9800;
-    width: 0%;
-    transition: .3s;
+.stat .label {
+  color:var(--muted);
+  font-size:10px;
+  letter-spacing:.6px;
+  text-transform:uppercase;
 }
 
-.small-bar {
-    background: #29b6f6;
-    width: 0%;
-    transition: .3s;
+.stat .value {
+  font-size:clamp(19px,2.5vw,25px);
+  font-weight:800;
+  margin-top:6px;
+  overflow-wrap:anywhere;
 }
 
-.detail {
-    color: #b8c5d6;
-    font-size: 12px;
+.green-text { color:var(--green); }
+.blue-text { color:var(--blue); }
+.orange-text { color:var(--orange); }
+.red-text { color:var(--red); }
+.violet-text { color:var(--violet); }
+
+.two-col {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
 }
 
-/* Analysis */
-
-.analysis-box {
-    background: #202d40;
-    padding: 13px;
-    border-left: 4px solid #00e676;
-    border-radius: 7px;
-    font-size: 12px;
-    line-height: 1.7;
-    color: #d2deeb;
+.bar-track {
+  display:flex;
+  width:100%;
+  height:14px;
+  border-radius:99px;
+  overflow:hidden;
+  background:#26364d;
+  margin:12px 0 8px;
 }
 
-.analysis-box.warning {
-    border-left-color: #ff4444;
-    color: #ff7777;
+.bar-big { background:var(--orange); width:0%; transition:width .25s; }
+.bar-small { background:var(--blue); width:0%; transition:width .25s; }
+
+.legend {
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  color:#c3d0e0;
+  font-size:11px;
 }
 
-.analysis-box.caution {
-    border-left-color: #ff9800;
-    color: #ffc36b;
+.stat-list {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
 }
 
-/* History */
+.mini {
+  background:#0e1929;
+  border:1px solid #2a3a51;
+  padding:10px;
+  border-radius:9px;
+}
 
-.table-container {
-    max-height: 300px;
-    overflow-y: auto;
-    border-radius: 8px;
-    border: 1px solid #394b62;
+.mini span {
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+  margin-bottom:5px;
+}
+
+.mini strong { font-size:15px; }
+
+.analysis {
+  padding:11px 13px;
+  background:#102b2a;
+  border:1px solid #17634e;
+  border-left:4px solid var(--green);
+  border-radius:9px;
+  color:#c7f7e8;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.analysis.caution {
+  background:#302516;
+  border-color:#805b22;
+  border-left-color:var(--orange);
+  color:#ffe0a8;
+}
+
+.chart-wrap { overflow-x:auto; }
+
+.hour-chart {
+  display:grid;
+  grid-template-columns:repeat(12,minmax(38px,1fr));
+  gap:6px;
+  min-width:480px;
+  align-items:end;
+  height:135px;
+  padding-top:8px;
+}
+
+.hour-col {
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  align-items:center;
+  gap:4px;
+}
+
+.hour-stack {
+  width:100%;
+  height:95px;
+  background:#0c1726;
+  border-radius:5px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+}
+
+.hour-big { background:var(--orange); min-height:0; }
+.hour-small { background:var(--blue); min-height:0; }
+.hour-label { color:var(--muted); font-size:9px; }
+.hour-count { color:#d5e2f1; font-size:9px; }
+
+.toolbar {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.toolbar select,
+.toolbar input {
+  width:auto;
+  flex:1;
+  min-width:120px;
+  padding:8px;
+  font-size:11px;
+}
+
+.table-wrap {
+  max-height:380px;
+  overflow:auto;
+  border:1px solid #2c3d54;
+  border-radius:9px;
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
+  width:100%;
+  border-collapse:collapse;
+  min-width:780px;
+  font-size:11px;
 }
 
 th,td {
-    padding: 10px 5px;
-    border-bottom: 1px solid #394b62;
-    text-align: center;
+  padding:9px 8px;
+  text-align:center;
+  border-bottom:1px solid #293950;
+  white-space:nowrap;
 }
 
 th {
-    background: #263449;
-    color: #aab8c9;
-    position: sticky;
-    top: 0;
+  position:sticky;
+  top:0;
+  background:#24354c;
+  color:#b9c8da;
+  z-index:1;
 }
 
-.tag-big { color: #ff9800; font-weight: bold; }
-.tag-small { color: #29b6f6; font-weight: bold; }
-.win { color: #4caf50; font-weight: bold; }
-.loss { color: #f44336; font-weight: bold; }
+tbody tr:hover { background:#ffffff08; }
 
-/* Controls */
+.big-tag { color:var(--orange); font-weight:800; }
+.small-tag { color:var(--blue); font-weight:800; }
+.prediction-chip { color:var(--violet); font-weight:800; }
+.check-win { color:var(--green); font-weight:800; }
+.check-loss { color:var(--red); font-weight:800; }
+.check-na { color:var(--muted); }
+.empty { color:var(--muted); text-align:center; padding:22px; }
 
-.controls {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 12px;
+.footer {
+  text-align:center;
+  color:#72849c;
+  font-size:10px;
+  padding:14px 0 5px;
+  line-height:1.5;
 }
 
-.control-btn {
-    flex: 1;
-    min-width: 90px;
-    padding: 11px;
-    border: none;
-    border-radius: 7px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
+@media(max-width:850px) {
+  .signal-hero { grid-template-columns:1fr; }
+  .input-grid { grid-template-columns:repeat(2,1fr); }
+  .input-grid .submit-field { grid-column:span 2; }
+  .stats-grid { grid-template-columns:repeat(2,1fr); }
 }
 
-.undo { background: #b7791f; }
-.reset { background: #c0392b; }
-.export { background: #087e59; }
-
-select {
-    width: 100%;
-    padding: 10px;
-    background: #263449;
-    color: white;
-    border: 1px solid #40516a;
-    border-radius: 7px;
-    margin-bottom: 10px;
-}
-
-.note {
-    color: #9eafc4;
-    font-size: 11px;
-    line-height: 1.6;
-}
-
-@media(max-width:450px) {
-    body { padding: 7px; }
-    .container { padding: 10px; }
-    h1 { font-size: 20px; }
-    .val { font-size: 19px; }
+@media(max-width:520px) {
+  body { padding:9px; }
+  .panel { padding:12px; }
+  .number-pad { grid-template-columns:repeat(5,1fr); }
+  .two-col { grid-template-columns:1fr; }
+  .field.time-field { grid-column:span 2; }
+  .btn { width:100%; }
+  .toolbar { display:grid; grid-template-columns:1fr 1fr; }
+  .toolbar select, .toolbar input { width:100%; min-width:0; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<!-- PASS-KEY GATE OVERLAY: covers the whole site until a valid pass key is entered -->
+<div id="passGate" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at top,#14243a 0%,#090e19 60%);padding:16px;">
+  <div style="width:100%;max-width:380px;background:linear-gradient(145deg,rgba(24,37,56,.98),rgba(16,25,39,.98));border:1px solid #2b3b52;border-radius:15px;padding:26px 22px;box-shadow:0 12px 40px #0007;text-align:center;">
+    <div style="font-size:34px;line-height:1;">🔒</div>
+    <h2 style="color:#00e6a0;font-size:16px;margin:12px 0 4px;letter-spacing:.6px;">PASS KEY REQUIRED</h2>
+    <p style="color:#91a2b8;font-size:12px;margin-bottom:18px;line-height:1.5;">Ye site protected hai. Access ke liye valid pass key daalo.</p>
+    <input id="passKeyInput" type="password" placeholder="Enter pass key" autocomplete="off" spellcheck="false"
+      style="width:100%;background:#0d1726;color:#edf4ff;border:1px solid #35465f;border-radius:8px;padding:12px;outline:none;font:inherit;text-align:center;letter-spacing:1px;">
+    <div id="passKeyError" style="color:#ff8995;font-size:11px;min-height:16px;margin-top:8px;"></div>
+    <button id="passKeyBtn" type="button" style="width:100%;margin-top:4px;border:0;border-radius:8px;padding:12px;font-weight:800;color:#07150f;background:#00e6a0;cursor:pointer;font:inherit;">UNLOCK</button>
+  </div>
+</div>
 
-<h1>⚡ PATTERN & LOSS ANALYZER</h1>
-<p class="subtitle">Live Statistics • Trend Analysis • Risk Monitor</p>
+<div class="app">
 
-<!-- NUMBER PAD -->
+<header>
+  <div class="brand">
+    <h1>◈ 51GAME TREND & PATTERN ANALYZER</h1>
+    <p>1-Tap Entry · Live Signal · Auto-Learning History</p>
+  </div>
+  <div class="live-pill" id="nextRoundBadge">NEXT ROUND: #1</div>
+</header>
 
-<div class="section">
-    <h2>ENTER GAME RESULT</h2>
+<!-- 1. NEXT SIGNAL & ONE-TAP NUMBER PAD (TOP PRIORITY) -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>⚡ NEXT ROUND SIGNAL & 1-TAP ENTRY</h2>
+    <span class="subtle" id="lastUpdated">Ready</span>
+  </div>
+
+  <div class="signal-hero">
+    <div class="signal-main">
+      <div class="signal-tag" id="signalForRound">NEXT ESTIMATE (ROUND #1)</div>
+      <div class="signal-value WAIT" id="nextEstimate">WAIT (3+ ROUNDS)</div>
+      <div class="signal-reason" id="patternSignal">Tap the last winning number below to start</div>
+    </div>
+
+    <div class="signal-meta">
+      <div class="meta-box">
+        <span>SIGNAL STRENGTH</span>
+        <strong class="green-text" id="signalConfidence">—</strong>
+      </div>
+      <div class="meta-box">
+        <span>BACKTEST HIT RATE</span>
+        <strong class="blue-text" id="backtestAccuracy">—</strong>
+      </div>
+      <div class="meta-box">
+        <span>CURRENT STREAK</span>
+        <strong class="violet-text" id="currentStreak">—</strong>
+      </div>
+      <div class="meta-box">
+        <span>LOSS STREAK</span>
+        <strong class="red-text" id="lossStreak">0</strong>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:14px;">
+    <div class="panel-head" style="margin-bottom:8px;">
+      <span class="subtle" style="color:#d3e1f2;font-weight:600;">👆 TAP RESULT NUMBER (AUTO-SAVES ROUND + TIME)</span>
+      <span class="subtle" id="quickStatus">1 click = instant save</span>
+    </div>
     <div class="number-pad" id="numberPad"></div>
-
-    <div class="controls">
-        <button class="control-btn undo" onclick="undoLast()">↶ Undo</button>
-        <button class="control-btn reset" onclick="resetAll()">Reset</button>
-        <button class="control-btn export" onclick="exportCSV()">Export CSV</button>
+    <div class="pad-actions">
+      <span class="subtle">0–4 = SMALL | 5–9 = BIG</span>
+      <button class="btn orange small" id="undoBtnTop" type="button">↩ Undo Last Tap</button>
     </div>
+  </div>
+</section>
+
+<!-- 2. LIVE OVERVIEW -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>LIVE OVERVIEW</h2>
+    <span class="subtle" id="winLossSummary">Hits: 0 | Misses: 0</span>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat">
+      <div class="label">Total rounds</div>
+      <div class="value green-text" id="totalRounds">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="label">BIG results</div>
+      <div class="value orange-text" id="bigCount">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="label">SMALL results</div>
+      <div class="value blue-text" id="smallCount">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="label">Last 10 split</div>
+      <div class="value violet-text" id="lastTen">—</div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. DISTRIBUTION & PATTERNS -->
+<div class="two-col">
+  <section class="panel">
+    <div class="panel-head">
+      <h2>BIG / SMALL DISTRIBUTION</h2>
+    </div>
+
+    <div class="bar-track">
+      <div class="bar-big" id="bigBar"></div>
+      <div class="bar-small" id="smallBar"></div>
+    </div>
+
+    <div class="legend">
+      <span id="bigLegend">● BIG 0 (0%)</span>
+      <span id="smallLegend">● SMALL 0 (0%)</span>
+    </div>
+
+    <div class="analysis" id="analysisBox" style="margin-top:14px;">
+      Add rounds to begin historical analysis.
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>STREAK & PATTERNS</h2>
+    </div>
+
+    <div class="stat-list">
+      <div class="mini">
+        <span>Longest BIG streak</span>
+        <strong class="orange-text" id="longBig">0</strong>
+      </div>
+
+      <div class="mini">
+        <span>Longest SMALL streak</span>
+        <strong class="blue-text" id="longSmall">0</strong>
+      </div>
+
+      <div class="mini">
+        <span>BIG/SMALL switches</span>
+        <strong id="switches">0</strong>
+      </div>
+
+      <div class="mini">
+        <span>ABAB zigzag count</span>
+        <strong id="ababCount">0</strong>
+      </div>
+
+      <div class="mini">
+        <span>Most common pair</span>
+        <strong id="commonPair">—</strong>
+      </div>
+
+      <div class="mini">
+        <span>Alternation check</span>
+        <strong id="alternationSignal">—</strong>
+      </div>
+    </div>
+  </section>
 </div>
 
-<!-- NEXT PREDICTION -->
+<!-- 4. MANUAL CUSTOM ENTRY (OPTIONAL) -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>CUSTOM ROUND / TIME ENTRY (OPTIONAL)</h2>
+    <span class="subtle">Use only if editing specific round number or past time</span>
+  </div>
 
-<div class="prediction-card">
-    <h2>NEXT ROUND TREND ESTIMATE</h2>
-    <div id="prediction" class="prediction-value">WAITING</div>
-    <div id="predictionReason" class="prediction-reason">
-        Enter results to calculate historical trend.
+  <form id="entryForm">
+    <div class="input-grid">
+      <div class="field">
+        <label for="roundInput">ROUND</label>
+        <input id="roundInput" type="number" min="1" step="1" placeholder="Auto">
+      </div>
+
+      <div class="field">
+        <label for="numberInput">NUMBER (0–9)</label>
+        <input id="numberInput" type="number" min="0" max="9" step="1" placeholder="0–9" required>
+      </div>
+
+      <div class="field">
+        <label for="categoryInput">CATEGORY</label>
+        <select id="categoryInput">
+          <option value="AUTO">Auto from number</option>
+          <option value="BIG">BIG</option>
+          <option value="SMALL">SMALL</option>
+        </select>
+      </div>
+
+      <div class="field time-field">
+        <label for="timeInput">DATE & TIME</label>
+        <input id="timeInput" type="datetime-local" required>
+      </div>
+
+      <div class="field submit-field">
+        <label>&nbsp;</label>
+        <button class="btn" type="submit">＋ Add</button>
+      </div>
     </div>
-</div>
+    <div class="form-error" id="formError" role="status"></div>
+  </form>
+</section>
 
-<!-- DASHBOARD -->
+<!-- 5. TIME-BASED ACTIVITY -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>TIME-BASED ACTIVITY (HOUR WISE)</h2>
+    <span class="subtle">Local clock hour</span>
+  </div>
 
-<div class="section">
-    <h2>LIVE DASHBOARD</h2>
+  <div class="chart-wrap">
+    <div class="hour-chart" id="hourChart"></div>
+  </div>
+</section>
 
-    <div class="dashboard">
+<!-- 6. NUMBER FREQUENCY -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>NUMBER FREQUENCY (0–9)</h2>
+    <span class="subtle">Counts in saved history</span>
+  </div>
 
-        <div class="card">
-            <h3>TOTAL ROUNDS</h3>
-            <div class="val" id="total">0</div>
-        </div>
+  <div class="stats-grid" id="numberFrequency"></div>
+</section>
 
-        <div class="card">
-            <h3>TOTAL WINS</h3>
-            <div class="val green-text" id="wins">0</div>
-        </div>
-
-        <div class="card">
-            <h3>TOTAL LOSSES</h3>
-            <div class="val red-text" id="losses">0</div>
-        </div>
-
-        <div class="card">
-            <h3>WIN ACCURACY</h3>
-            <div class="val orange" id="accuracy">0%</div>
-        </div>
-
-        <div class="card">
-            <h3>BIG RESULTS</h3>
-            <div class="val orange" id="bigCount">0</div>
-        </div>
-
-        <div class="card">
-            <h3>SMALL RESULTS</h3>
-            <div class="val blue" id="smallCount">0</div>
-        </div>
-
-    </div>
-</div>
-
-<!-- DISTRIBUTION -->
-
-<div class="section">
-    <h2>BIG / SMALL DISTRIBUTION</h2>
-
-    <div class="bar-bg">
-        <div class="big-bar" id="bigBar"></div>
-        <div class="small-bar" id="smallBar"></div>
-    </div>
-
-    <div class="detail" id="distribution">
-        BIG: 0% | SMALL: 0%
-    </div>
-</div>
-
-<!-- ANALYSIS -->
-
-<div class="section">
-    <h2>VOLATILITY & RISK ANALYSIS</h2>
-
-    <div class="analysis-box" id="analysis">
-        Waiting for game results...
-    </div>
-
-    <div class="detail" style="margin-top:12px">
-        Current Loss Streak:
-        <strong id="lossStreak">0</strong>
-        <br>
-        Current Result Streak:
-        <strong id="resultStreak">-</strong>
-        <br>
-        Recent Alternation:
-        <strong id="alternation">-</strong>
-    </div>
-</div>
-
-<!-- HISTORY -->
-
-<div class="section">
+<!-- 7. ROUND HISTORY TABLE -->
+<section class="panel">
+  <div class="panel-head">
     <h2>ROUND HISTORY</h2>
+    <span class="subtle" id="visibleCount">0 entries</span>
+  </div>
 
-    <select id="filter" onchange="updateHistory()">
-        <option value="all">All Rounds</option>
-        <option value="10">Last 10 Rounds</option>
-        <option value="20">Last 20 Rounds</option>
-        <option value="50">Last 50 Rounds</option>
+  <div class="toolbar">
+    <select id="categoryFilter">
+      <option value="ALL">All categories</option>
+      <option value="BIG">BIG only</option>
+      <option value="SMALL">SMALL only</option>
     </select>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>ROUND</th>
-                    <th>NUMBER</th>
-                    <th>CATEGORY</th>
-                    <th>PREDICTION</th>
-                    <th>STATUS</th>
-                </tr>
-            </thead>
-            <tbody id="historyTable"></tbody>
-        </table>
-    </div>
-</div>
+    <input id="searchInput" type="search" placeholder="Search round / number">
 
-<div class="section">
-    <p class="note">
-        Predictions are estimates based on historical trends only.
-        Random game results cannot be reliably predicted.
-        Accuracy measures past predictions and does not guarantee
-        future results. Avoid betting based on these estimates.
-    </p>
+    <button class="btn blue small" id="exportBtn" type="button">Export CSV</button>
+    <button class="btn secondary small" id="importBtn" type="button">Import CSV</button>
+    <input id="fileInput" type="file" accept=".csv,text/csv" hidden>
+    <button class="btn orange small" id="undoBtn" type="button">Undo last</button>
+    <button class="btn danger small" id="clearBtn" type="button">Clear all</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ROUND</th>
+          <th>NUMBER</th>
+          <th>CATEGORY</th>
+          <th>DATE</th>
+          <th>TIME</th>
+          <th>ENTRY</th>
+          <th>SIGNAL WAS</th>
+          <th>RESULT</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody">
+        <tr><td colspan="8" class="empty">No rounds recorded yet.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="footer">
+  51GAME PATTERN & TREND ANALYZER · LOCALSTORAGE AUTO-SAVE<br>
+  Statistical analysis reflects past recorded patterns only; outcomes remain probabilistic.
 </div>
 
 </div>
 
 <script>
+(() => {
 "use strict";
 
-let history = [];
+const STORAGE_KEY = "dynamicTrendDashboard_v1";
+let entries = [];
 
-const COLORS = [
-    "Violet","Green","Red","Green","Red",
-    "Violet","Red","Green","Red","Green"
-];
+const $ = id => document.getElementById(id);
+const pad2 = n => String(n).padStart(2,"0");
 
-function category(n) {
-    return n <= 4 ? "SMALL" : "BIG";
+function localDateTimeValue(date = new Date()) {
+  return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}T${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
 }
 
-function getPrediction() {
-    const cats = history.map(x => category(x.number));
-    const len = cats.length;
+function categoryFromNumber(number) {
+  return number >= 5 ? "BIG" : "SMALL";
+}
 
-    if(len < 3) {
-        return {
-            value: null,
-            reason: "Need at least 3 results for trend analysis."
-        };
+function makeId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+}
+
+function getNextRoundNumber() {
+  return entries.reduce((m, x) => Math.max(m, x.round), 0) + 1;
+}
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    $("lastUpdated").textContent = "Saved " + new Date().toLocaleTimeString();
+  } catch(error) {
+    $("formError").textContent = "Browser storage full. Export CSV backup.";
+  }
+}
+
+function load() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    if(!Array.isArray(parsed)) return;
+
+    entries = parsed.filter(item =>
+      item &&
+      Number.isInteger(Number(item.round)) &&
+      Number.isInteger(Number(item.number)) &&
+      Number(item.number)>=0 &&
+      Number(item.number)<=9 &&
+      ["BIG","SMALL"].includes(item.category) &&
+      !Number.isNaN(Date.parse(item.time))
+    ).map(item => ({
+      id: item.id || makeId(),
+      round: Number(item.round),
+      number: Number(item.number),
+      category: item.category,
+      time: new Date(item.time).toISOString(),
+      mode: item.mode || "1-Tap"
+    }));
+  } catch(_) {
+    entries = [];
+  }
+  entries.sort((a,b) => a.round - b.round);
+}
+
+function addEntry(round, number, category, time, mode = "1-Tap") {
+  const normalizedTime = new Date(time);
+  if(!Number.isFinite(normalizedTime.getTime())) {
+    throw new Error("Invalid date and time.");
+  }
+  if(entries.some(item => item.round === round)) {
+    throw new Error(`Round #${round} already exists.`);
+  }
+
+  const finalCat = category === "AUTO" ? categoryFromNumber(number) : category;
+
+  entries.push({
+    id: makeId(),
+    round,
+    number,
+    category: finalCat,
+    time: normalizedTime.toISOString(),
+    mode
+  });
+
+  entries.sort((a,b) => a.round - b.round);
+  save();
+  render();
+}
+
+function calculateStats() {
+  const total = entries.length;
+  const big = entries.filter(x => x.category === "BIG").length;
+  const small = total - big;
+
+  const counts = Array(10).fill(0);
+  const byHour = Array.from({length:24}, () => ({big:0, small:0, total:0}));
+
+  let longestBig = 0;
+  let longestSmall = 0;
+  let run = 0;
+  let runCategory = null;
+  let switches = 0;
+  let abab = 0;
+  const pairCounts = {};
+
+  entries.forEach((entry, index) => {
+    counts[entry.number]++;
+    const hour = new Date(entry.time).getHours();
+    byHour[hour].total++;
+    byHour[hour][entry.category.toLowerCase()]++;
+
+    if(entry.category === runCategory) {
+      run++;
+    } else {
+      runCategory = entry.category;
+      run = 1;
     }
 
-    const last = cats[len - 1];
-    const previous = cats[len - 2];
-    const third = cats[len - 3];
+    if(runCategory === "BIG") longestBig = Math.max(longestBig, run);
+    else longestSmall = Math.max(longestSmall, run);
 
-    // Continuous streak: flag the observed trend
-    if(last === previous && previous === third) {
-        return {
-            value: last,
-            reason: "Three consecutive identical categories observed."
-        };
+    if(index > 0 && entries[index-1].category !== entry.category) {
+      switches++;
     }
 
-    // Alternating pattern
-    const recent4 = cats.slice(-4);
-
-    if(recent4.length === 4 &&
-       recent4[0] === recent4[2] &&
-       recent4[1] === recent4[3] &&
-       recent4[0] !== recent4[1]) {
-        return {
-            value: last === "BIG" ? "SMALL" : "BIG",
-            reason: "Alternating ABAB pattern detected."
-        };
+    if(index >= 3) {
+      const seq = entries.slice(index-3, index+1).map(x => x.category);
+      if(seq[0] === seq[2] && seq[1] === seq[3] && seq[0] !== seq[1]) {
+        abab++;
+      }
     }
 
-    // Last 10 rounds frequency
-    const recent = cats.slice(-10);
-    const big = recent.filter(x => x === "BIG").length;
-    const small = recent.length - big;
-
-    if(big > small) {
-        return {
-            value: "BIG",
-            reason: "BIG occurred more often in recent results."
-        };
+    if(index > 0) {
+      const pair = entries[index-1].category[0] + "-" + entry.category[0];
+      pairCounts[pair] = (pairCounts[pair] || 0) + 1;
     }
+  });
 
-    if(small > big) {
-        return {
-            value: "SMALL",
-            reason: "SMALL occurred more often in recent results."
-        };
+  const last = entries[total - 1];
+  let currentStreak = 0;
+  if(last) {
+    for(let i = total - 1; i >= 0 && entries[i].category === last.category; i--) {
+      currentStreak++;
     }
+  }
 
+  const lastTenEntries = entries.slice(-10);
+  const lastTenBig = lastTenEntries.filter(x => x.category === "BIG").length;
+  const pairSorted = Object.entries(pairCounts).sort((a,b) => b[1] - a[1]);
+  const commonPair = pairSorted.length ? `${pairSorted[0][0]} (${pairSorted[0][1]})` : "—";
+
+  return {
+    total, big, small, counts, byHour,
+    longestBig, longestSmall, switches, abab,
+    currentStreak, last, lastTenBig,
+    lastTenSmall: lastTenEntries.length - lastTenBig,
+    commonPair
+  };
+}
+
+/* ===================================
+   SMART PATTERN SIGNAL ENGINE
+=================================== */
+function estimateFromHistory(history) {
+  const cats = history.map(x => x.category);
+  if(cats.length < 3) return null;
+
+  const last = cats[cats.length - 1];
+  let streak = 1;
+  for(let i = cats.length - 2; i >= 0 && cats[i] === last; i--) {
+    streak++;
+  }
+
+  // 1. Check ABAB Zigzag pattern (e.g., B-S-B-S -> next B)
+  const lastFour = cats.slice(-4);
+  if(
+    lastFour.length === 4 &&
+    lastFour[0] === lastFour[2] &&
+    lastFour[1] === lastFour[3] &&
+    lastFour[0] !== lastFour[1]
+  ) {
     return {
-        value: last === "BIG" ? "SMALL" : "BIG",
-        reason: "Recent frequencies are equal; opposite category shown as a reference."
+      category: last === "BIG" ? "SMALL" : "BIG",
+      reason: "ABAB Zigzag active → Switch expected",
+      confidence: "64% (Pattern)"
     };
+  }
+
+  // 2. Long Streak Reversal (if 5+ same in a row, reversal pressure builds)
+  if(streak >= 5) {
+    return {
+      category: last === "BIG" ? "SMALL" : "BIG",
+      reason: `${streak}x ${last} streak → Reversal zone`,
+      confidence: "62% (Reversal)"
+    };
+  }
+
+  // 3. Trend Following (3 or 4 same in a row -> ride the dragon/trend)
+  if(streak >= 3) {
+    return {
+      category: last,
+      reason: `${streak}x ${last} trend active → Follow trend`,
+      confidence: "58% (Trend)"
+    };
+  }
+
+  // 4. Last 10 Momentum Bias
+  const recent = cats.slice(-10);
+  const big = recent.filter(x => x === "BIG").length;
+  const small = recent.length - big;
+
+  if(Math.abs(big - small) >= 2) {
+    const dominant = big > small ? "BIG" : "SMALL";
+    return {
+      category: dominant,
+      reason: `Last ${recent.length} momentum (${big}B / ${small}S)`,
+      confidence: "55% (Momentum)"
+    };
+  }
+
+  // 5. Fallback: Pair transition / Opposite of last
+  return {
+    category: last === "BIG" ? "SMALL" : "BIG",
+    reason: "Balanced market → Alternation pick",
+    confidence: "52% (Balanced)"
+  };
 }
 
-// Recalculate every prediction from the complete history.
-// This keeps undo and reset statistics consistent.
-function calculateHistory() {
-    let wins = 0;
-    let losses = 0;
-    let lossStreak = 0;
-    let maxLossStreak = 0;
+function getBacktestSummary() {
+  let wins = 0;
+  let losses = 0;
+  const checks = new Map();
 
-    const rows = [];
-    const outcomes = [];
+  entries.forEach((entry, index) => {
+    if(index < 3) {
+      checks.set(entry.id, { estimate: null, result: "N/A" });
+      return;
+    }
+    const prediction = estimateFromHistory(entries.slice(0, index));
+    const hit = prediction && prediction.category === entry.category;
+    if(hit) wins++;
+    else losses++;
 
-    history.forEach((item, index) => {
-        const prediction = getPredictionForHistory(rows);
+    checks.set(entry.id, {
+      estimate: prediction ? prediction.category : null,
+      result: hit ? "HIT" : "MISS"
+    });
+  });
 
-        let status = "N/A";
+  const total = wins + losses;
+  return {
+    wins,
+    losses,
+    accuracy: total ? (wins / total * 100) : null,
+    checks
+  };
+}
 
-        if(prediction) {
-            if(prediction === item.category) {
-                status = "WIN";
-                wins++;
-                lossStreak = 0;
-            } else {
-                status = "LOSS";
-                losses++;
-                lossStreak++;
-                maxLossStreak = Math.max(maxLossStreak, lossStreak);
-            }
-        }
+function renderPredictionAnalysis() {
+  const nextRound = getNextRoundNumber();
+  $("nextRoundBadge").textContent = `NEXT ROUND: #${nextRound}`;
+  $("signalForRound").textContent = `NEXT ESTIMATE (ROUND #${nextRound})`;
+  $("roundInput").placeholder = `Auto (#${nextRound})`;
 
-        rows.push({
-            round: index + 1,
-            number: item.number,
-            category: item.category,
-            prediction: prediction || "WAITING",
-            status: status
-        });
+  const summary = getBacktestSummary();
+  const prediction = estimateFromHistory(entries);
 
-        outcomes.push(status);
+  $("winLossSummary").textContent = `Hits: ${summary.wins} | Misses: ${summary.losses}`;
+  $("backtestAccuracy").textContent = summary.accuracy === null ? "—" : summary.accuracy.toFixed(1) + "%";
+
+  let lossStreak = 0;
+  for(let i = entries.length - 1; i >= 0; i--) {
+    const item = summary.checks.get(entries[i].id);
+    if(!item || item.result !== "MISS") break;
+    lossStreak++;
+  }
+  $("lossStreak").textContent = lossStreak;
+
+  const lastFour = entries.slice(-4).map(x => x.category);
+  const alternating = lastFour.length === 4 && lastFour[0] === lastFour[2] && lastFour[1] === lastFour[3] && lastFour[0] !== lastFour[1];
+  $("alternationSignal").textContent = alternating ? "ABAB Active" : "Normal";
+
+  const el = $("nextEstimate");
+  if(!prediction) {
+    el.textContent = "WAIT (3+ ROUNDS)";
+    el.className = "signal-value WAIT";
+    $("patternSignal").textContent = `Tap ${3 - entries.length} more result(s) below to unlock signal`;
+    $("signalConfidence").textContent = "—";
+  } else {
+    el.textContent = `👉 ${prediction.category}`;
+    el.className = "signal-value " + prediction.category;
+    $("patternSignal").textContent = prediction.reason;
+    $("signalConfidence").textContent = prediction.confidence;
+  }
+}
+
+function renderOverview(s) {
+  $("totalRounds").textContent = s.total;
+  $("bigCount").textContent = s.big;
+  $("smallCount").textContent = s.small;
+  $("currentStreak").textContent = s.last ? `${s.last.category} × ${s.currentStreak}` : "—";
+
+  const bigPct = s.total ? s.big / s.total * 100 : 0;
+  const smallPct = s.total ? s.small / s.total * 100 : 0;
+
+  $("bigBar").style.width = bigPct + "%";
+  $("smallBar").style.width = smallPct + "%";
+  $("bigLegend").textContent = `● BIG ${s.big} (${bigPct.toFixed(1)}%)`;
+  $("smallLegend").textContent = `● SMALL ${s.small} (${smallPct.toFixed(1)}%)`;
+
+  $("longBig").textContent = s.longestBig;
+  $("longSmall").textContent = s.longestSmall;
+  $("switches").textContent = s.switches;
+  $("ababCount").textContent = s.abab;
+  $("commonPair").textContent = s.commonPair;
+  $("lastTen").textContent = s.total ? `${s.lastTenBig}B / ${s.lastTenSmall}S` : "—";
+
+  const box = $("analysisBox");
+  box.className = "analysis";
+  if(!s.total) {
+    box.textContent = "Tap any number (0–9) above to record live rounds automatically.";
+  } else if(s.currentStreak >= 5) {
+    box.classList.add("caution");
+    box.textContent = `Alert: ${s.currentStreak}-round ${s.last.category} streak active right now.`;
+  } else {
+    box.textContent = `Total ${s.total} rounds logged. BIG: ${bigPct.toFixed(1)}% | SMALL: ${smallPct.toFixed(1)}%.`;
+  }
+}
+
+function renderHours(s) {
+  const chart = $("hourChart");
+  chart.innerHTML = "";
+  const max = Math.max(1, ...s.byHour.map(x => x.total));
+
+  s.byHour.forEach((data, hour) => {
+    const col = document.createElement("div");
+    col.className = "hour-col";
+
+    const count = document.createElement("div");
+    count.className = "hour-count";
+    count.textContent = data.total || "";
+
+    const stack = document.createElement("div");
+    stack.className = "hour-stack";
+
+    const big = document.createElement("div");
+    big.className = "hour-big";
+    big.style.height = (data.big / max * 100) + "%";
+
+    const small = document.createElement("div");
+    small.className = "hour-small";
+    small.style.height = (data.small / max * 100) + "%";
+
+    stack.append(big, small);
+
+    const label = document.createElement("div");
+    label.className = "hour-label";
+    label.textContent = pad2(hour);
+
+    col.append(count, stack, label);
+    col.title = `${pad2(hour)}:00 — ${data.big} BIG, ${data.small} SMALL`;
+    chart.appendChild(col);
+  });
+}
+
+function renderNumberFrequency(s) {
+  const root = $("numberFrequency");
+  root.innerHTML = "";
+  const max = Math.max(1, ...s.counts);
+
+  s.counts.forEach((count, n) => {
+    const card = document.createElement("div");
+    card.className = "mini";
+
+    const label = document.createElement("span");
+    label.textContent = `NUMBER ${n} (${n >= 5 ? "BIG" : "SMALL"})`;
+
+    const strong = document.createElement("strong");
+    strong.textContent = `${count} (${s.total ? (count / s.total * 100).toFixed(1) : "0.0"}%)`;
+    strong.style.color = count === max && count > 0 ? "var(--green)" : "var(--text)";
+
+    card.append(label, strong);
+    root.appendChild(card);
+  });
+}
+
+function renderTable() {
+  const body = $("historyBody");
+  body.innerHTML = "";
+
+  const categoryFilter = $("categoryFilter").value;
+  const query = $("searchInput").value.trim().toLowerCase();
+  const backtest = getBacktestSummary();
+
+  const filtered = entries.filter(item => {
+    const matchesCategory = categoryFilter === "ALL" || item.category === categoryFilter;
+    const matchesQuery = !query || String(item.round).includes(query) || String(item.number).includes(query);
+    return matchesCategory && matchesQuery;
+  }).slice().reverse();
+
+  $("visibleCount").textContent = `${filtered.length} of ${entries.length} entries`;
+
+  if(!filtered.length) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.className = "empty";
+    td.textContent = entries.length ? "No matching rounds." : "No rounds recorded yet.";
+    tr.appendChild(td);
+    body.appendChild(tr);
+    return;
+  }
+
+  filtered.forEach(item => {
+    const date = new Date(item.time);
+    const tr = document.createElement("tr");
+    const check = backtest.checks.get(item.id) || { estimate: null, result: "N/A" };
+
+    const values = [
+      "#" + item.round,
+      item.number,
+      item.category,
+      date.toLocaleDateString(),
+      date.toLocaleTimeString([], { hour:"2-digit", minute:"2-digit", second:"2-digit" }),
+      item.mode || "1-Tap",
+      check.estimate || "—",
+      check.result
+    ];
+
+    values.forEach((value, index) => {
+      const td = document.createElement("td");
+      td.textContent = value;
+      if(index === 2) td.className = item.category === "BIG" ? "big-tag" : "small-tag";
+      if(index === 6 && check.estimate) td.className = "prediction-chip";
+      if(index === 7) td.className = check.result === "HIT" ? "check-win" : check.result === "MISS" ? "check-loss" : "check-na";
+      tr.appendChild(td);
     });
 
-    return { rows, wins, losses, lossStreak, maxLossStreak };
-}
-
-function getPredictionForHistory(rows) {
-    if(rows.length < 2) return null;
-
-    const cats = rows.map(x => x.category);
-    const len = cats.length;
-
-    const last = cats[len-1];
-    const previous = cats[len-2];
-    const third = len >= 3 ? cats[len-3] : null;
-
-    if(last === previous && previous === third) return last;
-
-    const recent4 = cats.slice(-4);
-
-    if(recent4.length === 4 &&
-       recent4[0] === recent4[2] &&
-       recent4[1] === recent4[3] &&
-       recent4[0] !== recent4[1]) {
-        return last === "BIG" ? "SMALL" : "BIG";
-    }
-
-    const recent = cats.slice(-10);
-    const big = recent.filter(x => x === "BIG").length;
-    const small = recent.length - big;
-
-    if(big > small) return "BIG";
-    if(small > big) return "SMALL";
-
-    return last === "BIG" ? "SMALL" : "BIG";
-}
-
-function addRound(number) {
-    history.push({
-        number: number,
-        category: category(number)
-    });
-
-    saveData();
-    render();
-}
-
-function undoLast() {
-    if(!history.length) return;
-
-    history.pop();
-    saveData();
-    render();
-}
-
-function resetAll() {
-    if(!confirm("Clear all game history?")) return;
-
-    history = [];
-    saveData();
-    render();
-}
-
-function saveData() {
-    try {
-        localStorage.setItem(
-            "patternAnalyzerHistory",
-            JSON.stringify(history)
-        );
-    } catch(e) {
-        console.warn("Storage unavailable", e);
-    }
-}
-
-function loadData() {
-    try {
-        const data = JSON.parse(
-            localStorage.getItem("patternAnalyzerHistory") || "[]"
-        );
-
-        if(Array.isArray(data) &&
-           data.every(x => x &&
-           Number.isInteger(x.number) &&
-           x.number >= 0 && x.number <= 9)) {
-            history = data.map(x => ({
-                number: x.number,
-                category: category(x.number)
-            }));
-        }
-    } catch(e) {
-        history = [];
-    }
+    body.appendChild(tr);
+  });
 }
 
 function render() {
-    const stats = calculateHistory();
-    const total = history.length;
-
-    const big = history.filter(x =>
-        x.category === "BIG"
-    ).length;
-
-    const small = total - big;
-
-    document.getElementById("total").textContent = total;
-    document.getElementById("wins").textContent = stats.wins;
-    document.getElementById("losses").textContent = stats.losses;
-    document.getElementById("bigCount").textContent = big;
-    document.getElementById("smallCount").textContent = small;
-
-    const evaluated = stats.wins + stats.losses;
-
-    const accuracy = evaluated
-        ? (stats.wins / evaluated * 100).toFixed(1)
-        : "0.0";
-
-    document.getElementById("accuracy").textContent =
-        accuracy + "%";
-
-    const bigPercent = total ? big / total * 100 : 0;
-    const smallPercent = total ? small / total * 100 : 0;
-
-    document.getElementById("bigBar").style.width =
-        bigPercent + "%";
-
-    document.getElementById("smallBar").style.width =
-        smallPercent + "%";
-
-    document.getElementById("distribution").textContent =
-        `BIG: ${bigPercent.toFixed(1)}% (${big}) | SMALL: ${smallPercent.toFixed(1)}% (${small})`;
-
-    // Next trend estimate
-    const pred = getPrediction();
-    const predElement = document.getElementById("prediction");
-
-    predElement.textContent = pred.value || "WAITING";
-    predElement.className = "prediction-value " +
-        (pred.value === "BIG" ? "pred-big" :
-        pred.value === "SMALL" ? "pred-small" : "");
-
-    document.getElementById("predictionReason").textContent =
-        pred.reason;
-
-    // Result streak
-    let resultStreak = 0;
-    let currentCategory = null;
-
-    for(let i = total - 1; i >= 0; i--) {
-        if(currentCategory === null) {
-            currentCategory = history[i].category;
-            resultStreak = 1;
-        } else if(history[i].category === currentCategory) {
-            resultStreak++;
-        } else {
-            break;
-        }
-    }
-
-    document.getElementById("resultStreak").textContent =
-        total ? currentCategory + " × " + resultStreak : "-";
-
-    document.getElementById("lossStreak").textContent =
-        stats.lossStreak;
-
-    // Alternation detection
-    const recent = history.slice(-5).map(x => x.category);
-    let alternating = recent.length >= 4;
-
-    for(let i = 1; i < recent.length; i++) {
-        if(recent[i] === recent[i-1]) {
-            alternating = false;
-            break;
-        }
-    }
-
-    document.getElementById("alternation").textContent =
-        alternating ? "Detected" : "Not detected";
-
-    // Risk analysis
-    const analysis = document.getElementById("analysis");
-
-    const recentLosses = stats.rows.slice(-3)
-        .filter(x => x.status === "LOSS").length;
-
-    const recentCats = history.slice(-6)
-        .map(x => x.category);
-
-    const bigRecent = recentCats.filter(x => x === "BIG").length;
-    const smallRecent = recentCats.length - bigRecent;
-
-    const highVariation = recentCats.length >= 6 &&
-        bigRecent >= 2 && smallRecent >= 2;
-
-    if(stats.lossStreak >= 3) {
-        analysis.className = "analysis-box warning";
-        analysis.textContent =
-            "⚠️ HIGH RISK: 3 or more consecutive prediction losses. Predictions are unreliable. Consider stopping and reviewing your results.";
-    } else if(recentLosses >= 2 || highVariation) {
-        analysis.className = "analysis-box caution";
-        analysis.textContent =
-            "⚠️ CAUTION: Recent outcomes show inconsistent results. Historical patterns may not continue.";
-    } else {
-        analysis.className = "analysis-box";
-        analysis.textContent = total < 3
-            ? "Enter at least 3 rounds to start trend analysis."
-            : "✅ No high-risk warning detected in the recorded prediction history. This does not mean the next result is safe or predictable.";
-    }
-
-    updateHistory();
-}
-
-function updateHistory() {
-    const tbody = document.getElementById("historyTable");
-    tbody.innerHTML = "";
-
-    const stats = calculateHistory();
-    const filter = document.getElementById("filter").value;
-
-    let rows = stats.rows;
-
-    if(filter !== "all") {
-        rows = rows.slice(-Number(filter));
-    }
-
-    rows.slice().reverse().forEach(row => {
-        const tr = document.createElement("tr");
-
-        const values = [
-            "#" + row.round,
-            row.number,
-            row.category,
-            row.prediction,
-            row.status
-        ];
-
-        values.forEach((value, i) => {
-            const td = document.createElement("td");
-            td.textContent = value;
-
-            if(i === 2) {
-                td.className = row.category === "BIG"
-                    ? "tag-big" : "tag-small";
-            }
-
-            if(i === 4) {
-                td.className = row.status === "WIN"
-                    ? "win" : row.status === "LOSS"
-                    ? "loss" : "";
-            }
-
-            tr.appendChild(td);
-        });
-
-        tbody.appendChild(tr);
-    });
+  const stats = calculateStats();
+  renderPredictionAnalysis();
+  renderOverview(stats);
+  renderHours(stats);
+  renderNumberFrequency(stats);
+  renderTable();
 }
 
 function exportCSV() {
-    if(!history.length) {
-        alert("No history available.");
-        return;
+  if(!entries.length) return alert("No data to export yet.");
+  const lines = [["Round", "Number", "Category", "Time"]];
+  entries.forEach(x => lines.push([x.round, x.number, x.category, x.time]));
+  const csv = lines.map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\r\n");
+  const blob = new Blob(["\uFEFF" + csv], { type:"text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "51game-pattern-history.csv";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [], cell = "", quoted = false;
+  for(let i = 0; i < text.length; i++) {
+    const ch = text[i], next = text[i+1];
+    if(ch === '"' && quoted && next === '"') { cell += '"'; i++; }
+    else if(ch === '"') quoted = !quoted;
+    else if(ch === "," && !quoted) { row.push(cell); cell = ""; }
+    else if((ch === "\n" || ch === "\r") && !quoted) {
+      if(ch === "\r" && next === "\n") i++;
+      row.push(cell); rows.push(row); row = []; cell = "";
+    } else cell += ch;
+  }
+  if(cell.length || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter(r => r.some(v => String(v).trim() !== ""));
+}
+
+function importCSV(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const rows = parseCSV(String(reader.result || ""));
+      if(rows.length < 2) throw new Error("CSV has no data rows.");
+      const header = rows[0].map(x => x.trim().toLowerCase());
+      const indexOf = names => header.findIndex(h => names.includes(h));
+      const ri = indexOf(["round","rnd"]);
+      const ni = indexOf(["number","no"]);
+      const ci = indexOf(["category","cat"]);
+      const ti = indexOf(["time","datetime","date"]);
+      if(ri < 0 || ni < 0) throw new Error("CSV needs Round and Number columns.");
+
+      let added = 0, skipped = 0;
+      rows.slice(1).forEach(row => {
+        const round = Number(row[ri]);
+        const number = Number(row[ni]);
+        const rawCat = ci >= 0 ? String(row[ci] || "").trim().toUpperCase() : "";
+        const category = ["BIG","SMALL"].includes(rawCat) ? rawCat : categoryFromNumber(number);
+        const rawTime = ti >= 0 ? String(row[ti] || "").trim() : "";
+        const time = rawTime && !Number.isNaN(Date.parse(rawTime)) ? new Date(rawTime) : new Date();
+
+        if(!Number.isInteger(round) || round < 1 || !Number.isInteger(number) || number < 0 || number > 9 || entries.some(x => x.round === round)) {
+          skipped++; return;
+        }
+        entries.push({ id: makeId(), round, number, category, time: time.toISOString(), mode: "CSV" });
+        added++;
+      });
+
+      entries.sort((a,b) => a.round - b.round);
+      save();
+      render();
+      alert(`Import complete! Added: ${added}, Skipped: ${skipped}`);
+    } catch(error) {
+      alert("Import failed: " + error.message);
+    } finally {
+      $("fileInput").value = "";
     }
-
-    const rows = calculateHistory().rows;
-
-    let csv = "Round,Number,Category,Prediction,Status\n";
-
-    rows.forEach(row => {
-        csv += `${row.round},${row.number},${row.category},${row.prediction},${row.status}\n`;
-    });
-
-    const blob = new Blob([csv], {
-        type: "text/csv;charset=utf-8"
-    });
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "pattern-history.csv";
-    link.click();
-
-    URL.revokeObjectURL(url);
+  };
+  reader.readAsText(file);
 }
 
-// Initialize
-const pad = document.getElementById("numberPad");
+/* MANUAL FORM SUBMIT */
+$("entryForm").addEventListener("submit", event => {
+  event.preventDefault();
+  $("formError").textContent = "";
+  const roundRaw = $("roundInput").value.trim();
+  const numberRaw = $("numberInput").value.trim();
+  const round = roundRaw === "" ? getNextRoundNumber() : Number(roundRaw);
+  const number = Number(numberRaw);
+  const category = $("categoryInput").value;
+  const time = $("timeInput").value;
 
-for(let i = 0; i <= 9; i++) {
-    const button = document.createElement("button");
+  try {
+    if(!Number.isInteger(round) || round < 1) throw new Error("Round must be positive.");
+    if(numberRaw === "" || !Number.isInteger(number) || number < 0 || number > 9) throw new Error("Number must be 0–9.");
+    if(!time) throw new Error("Choose date & time.");
 
-    button.textContent = i;
-    button.className = "num-btn " +
-        (i === 0 || i === 5 ? "violet" :
-        [1,3,7,9].includes(i) ? "green" : "red");
+    addEntry(round, number, category, time, "Manual");
+    $("roundInput").value = "";
+    $("numberInput").value = "";
+    $("categoryInput").value = "AUTO";
+    $("timeInput").value = localDateTimeValue();
+    $("formError").textContent = `Round #${round} added.`;
+    $("formError").style.color = "var(--green)";
+  } catch(error) {
+    $("formError").textContent = error.message;
+    $("formError").style.color = "var(--red)";
+  }
+});
 
-    button.addEventListener("click", () => addRound(i));
-    pad.appendChild(button);
+/* 1-TAP INSTANT NUMBER PAD */
+for(let n = 0; n <= 9; n++) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "num-btn " + ([0,5].includes(n) ? "violet" : [1,3,7,9].includes(n) ? "green" : "red");
+  button.innerHTML = `${n}<small>${n >= 5 ? "BIG" : "SMALL"}</small>`;
+
+  button.addEventListener("click", () => {
+    const nextRound = getNextRoundNumber();
+    const now = new Date();
+    addEntry(nextRound, n, "AUTO", now.toISOString(), "1-Tap");
+    $("timeInput").value = localDateTimeValue(now);
+    $("quickStatus").textContent = `✅ Added #${nextRound} → ${n} (${n >= 5 ? "BIG" : "SMALL"})`;
+    $("quickStatus").style.color = "var(--green)";
+  });
+
+  $("numberPad").appendChild(button);
 }
 
-loadData();
+function undoLast() {
+  if(!entries.length) return;
+  const removed = entries.pop();
+  save();
+  render();
+  $("quickStatus").textContent = `↩ Removed #${removed.round}`;
+  $("quickStatus").style.color = "var(--orange)";
+}
+
+$("categoryFilter").addEventListener("change", renderTable);
+$("searchInput").addEventListener("input", renderTable);
+$("exportBtn").addEventListener("click", exportCSV);
+$("importBtn").addEventListener("click", () => $("fileInput").click());
+$("fileInput").addEventListener("change", e => { if(e.target.files?.[0]) importCSV(e.target.files[0]); });
+$("undoBtn").addEventListener("click", undoLast);
+$("undoBtnTop").addEventListener("click", undoLast);
+$("clearBtn").addEventListener("click", () => {
+  if(entries.length && confirm("Delete all saved rounds?")) {
+    entries = [];
+    save();
+    render();
+  }
+});
+
+$("timeInput").value = localDateTimeValue();
+
+// ---- PASS-KEY GATE: site tabhi khulegi jab valid pass key daali jaye ----
+const PASS_KEYS = [
+  "K9#m$L2p*Qx7!zW8",
+  "B4%vN9#j$K2m!Xp6",
+  "R7*b#L3k$Vw9!Np2",
+  "M2#dX8!q$J5z*Rt4",
+  "H9$f#C6l%Yw3!Bp7",
+  "L4#pK9!z$J8x*Rt2",
+  "T3!m#K8v$Xn2*Zq5",
+  "G6*p#R4d$Lm9!Wx1",
+  "P8#jN2!w$K7v*Qt3",
+  "F5$b#X9k%Mp4!Zs8",
+  "D2!mL7#q$Vw3*Nx6",
+  "W7$v#C3m%Yb5!Np9",
+  "J9!dX2#h$K6z*Qv4",
+  "N3*b#R8l$Vw1!Mp7",
+  "X6#fN5!w$L2k*Zq8",
+  "Q8$p#M4v%Xt9!Bp3",
+  "V2!m#K7d$J3z*Wx5",
+  "Z5*j#R9p%Ln6!Qt2",
+  "C8#bN3!w$K5v*Xp4",
+  "S4$dX6#q$Vw8!Np7"
+];
+const GATE_KEY = "trendAnalyzer_passgate_v1";
+
+function unlockSite() {
+  const gate = $("passGate");
+  if(gate && gate.parentNode) gate.parentNode.removeChild(gate);
+}
+
+function tryPassKey() {
+  const val = ($("passKeyInput").value || "").trim();
+  if(PASS_KEYS.indexOf(val) !== -1) {
+    try { localStorage.setItem(GATE_KEY, "1"); } catch(_) {}
+    unlockSite();
+  } else {
+    $("passKeyError").textContent = "✘ Galat pass key — dobara try karo.";
+    $("passKeyInput").value = "";
+    $("passKeyInput").focus();
+  }
+}
+
+(function initGate() {
+  let unlocked = false;
+  try { unlocked = localStorage.getItem(GATE_KEY) === "1"; } catch(_) {}
+  if(unlocked) { unlockSite(); return; }
+  $("passKeyBtn").addEventListener("click", tryPassKey);
+  $("passKeyInput").addEventListener("keydown", e => { if(e.key === "Enter") tryPassKey(); });
+  $("passKeyInput").focus();
+})();
+
+load();
 render();
-
+})();
 </script>
 </body>
 </html>
