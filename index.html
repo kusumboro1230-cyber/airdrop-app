@@ -498,11 +498,20 @@ tbody tr:hover { background:#ffffff08; }
   <div style="width:100%;max-width:380px;background:linear-gradient(145deg,rgba(24,37,56,.98),rgba(16,25,39,.98));border:1px solid #2b3b52;border-radius:15px;padding:26px 22px;box-shadow:0 12px 40px #0007;text-align:center;">
     <div style="font-size:34px;line-height:1;">🔒</div>
     <h2 style="color:#00e6a0;font-size:16px;margin:12px 0 4px;letter-spacing:.6px;">PASS KEY REQUIRED</h2>
-    <p style="color:#91a2b8;font-size:12px;margin-bottom:18px;line-height:1.5;">Ye site protected hai. Access ke liye valid pass key daalo.</p>
+    <p style="color:#91a2b8;font-size:12px;margin-bottom:18px;line-height:1.5;">Ye site protected hai. Valid pass key daalo — har key sirf <strong style="color:#edf4ff;">ek device</strong> pe chalti hai.</p>
     <input id="passKeyInput" type="password" placeholder="Enter pass key" autocomplete="off" spellcheck="false"
       style="width:100%;background:#0d1726;color:#edf4ff;border:1px solid #35465f;border-radius:8px;padding:12px;outline:none;font:inherit;text-align:center;letter-spacing:1px;">
     <div id="passKeyError" style="color:#ff8995;font-size:11px;min-height:16px;margin-top:8px;"></div>
     <button id="passKeyBtn" type="button" style="width:100%;margin-top:4px;border:0;border-radius:8px;padding:12px;font-weight:800;color:#07150f;background:#00e6a0;cursor:pointer;font:inherit;">UNLOCK</button>
+    <div style="margin-top:16px;border-top:1px dashed #35465f;padding-top:14px;">
+      <div style="color:#91a2b8;font-size:11px;margin-bottom:10px;line-height:1.5;">Key nahi hai? <strong style="color:#00e6a0;">Buy / Renew Key</strong> ke liye direct message karo:</div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <a href="https://t.me/mystressvibe" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:6px;background:#0d3029;border:1px solid #176b56;color:#6df2c4;border-radius:99px;padding:9px 14px;font-size:12px;font-weight:700;text-decoration:none;">✈️ Telegram</a>
+        <a href="https://instagram.com/master_vibe28" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:6px;background:#2b1030;border:1px solid #6b1756;color:#f26dd2;border-radius:99px;padding:9px 14px;font-size:12px;font-weight:700;text-decoration:none;">📸 Instagram</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -513,7 +522,11 @@ tbody tr:hover { background:#ffffff08; }
     <h1>◈ 51GAME TREND & PATTERN ANALYZER</h1>
     <p>1-Tap Entry · Live Signal · Auto-Learning History</p>
   </div>
-  <div class="live-pill" id="nextRoundBadge">NEXT ROUND: #1</div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="live-pill" id="nextRoundBadge">NEXT ROUND: #1</div>
+    <button id="lockBtn" type="button" title="Lock screen" aria-label="Lock screen"
+      style="border:1px solid #35465f;background:#0d1726;color:#91a2b8;border-radius:99px;width:38px;height:38px;font-size:16px;line-height:1;cursor:pointer;">🔒</button>
+  </div>
 </header>
 
 <!-- 1. NEXT SIGNAL & ONE-TAP NUMBER PAD (TOP PRIORITY) -->
@@ -765,6 +778,18 @@ tbody tr:hover { background:#ffffff08; }
 <div class="footer">
   51GAME PATTERN & TREND ANALYZER · LOCALSTORAGE AUTO-SAVE<br>
   Statistical analysis reflects past recorded patterns only; outcomes remain probabilistic.
+</div>
+
+<!-- Floating help / renew-key contact button -->
+<div id="helpFabWrap" style="position:fixed;right:16px;bottom:16px;z-index:900;display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+  <div id="helpFabMenu" style="display:none;flex-direction:column;gap:8px;align-items:stretch;">
+    <a href="https://t.me/mystressvibe" target="_blank" rel="noopener"
+       style="display:flex;align-items:center;gap:8px;background:#0d3029;border:1px solid #176b56;color:#6df2c4;border-radius:99px;padding:10px 14px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;">✈️ Telegram · @mystressvibe</a>
+    <a href="https://instagram.com/master_vibe28" target="_blank" rel="noopener"
+       style="display:flex;align-items:center;gap:8px;background:#2b1030;border:1px solid #6b1756;color:#f26dd2;border-radius:99px;padding:10px 14px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;">📸 Instagram · @master_vibe28</a>
+  </div>
+  <button id="helpFab" type="button"
+    style="border:0;border-radius:99px;padding:12px 18px;font-weight:800;font-size:13px;color:#07150f;background:#00e6a0;cursor:pointer;box-shadow:0 8px 24px #0006;font:inherit;">💬 Need Help / Renew Key</button>
 </div>
 
 </div>
@@ -1366,56 +1391,122 @@ $("clearBtn").addEventListener("click", () => {
 
 $("timeInput").value = localDateTimeValue();
 
-// ---- PASS-KEY GATE: site tabhi khulegi jab valid pass key daali jaye ----
-const PASS_KEYS = [
-  "K9#m$L2p*Qx7!zW8",
-  "B4%vN9#j$K2m!Xp6",
-  "R7*b#L3k$Vw9!Np2",
-  "M2#dX8!q$J5z*Rt4",
-  "H9$f#C6l%Yw3!Bp7",
-  "L4#pK9!z$J8x*Rt2",
-  "T3!m#K8v$Xn2*Zq5",
-  "G6*p#R4d$Lm9!Wx1",
-  "P8#jN2!w$K7v*Qt3",
-  "F5$b#X9k%Mp4!Zs8",
-  "D2!mL7#q$Vw3*Nx6",
-  "W7$v#C3m%Yb5!Np9",
-  "J9!dX2#h$K6z*Qv4",
-  "N3*b#R8l$Vw1!Mp7",
-  "X6#fN5!w$L2k*Zq8",
-  "Q8$p#M4v%Xt9!Bp3",
-  "V2!m#K7d$J3z*Wx5",
-  "Z5*j#R9p%Ln6!Qt2",
-  "C8#bN3!w$K5v*Xp4",
-  "S4$dX6#q$Vw8!Np7"
-];
+// ---- PASS-KEY GATE (Supabase): 1 KEY = 1 DEVICE ----
+// Setup: niche SUPABASE_URL aur SUPABASE_ANON_KEY apne Supabase project se bharo.
+// Keys database me hoti hain (is file me nahi), isliye forward karne se kaam nahi chalega.
+const SUPABASE_URL = "PASTE_YOUR_PROJECT_URL";      // e.g. https://abcdefgh.supabase.co
+const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY";     // Settings → API → anon public key
+
 const GATE_KEY = "trendAnalyzer_passgate_v1";
+const DEVICE_KEY = "trendAnalyzer_device_id_v1";
+
+function supabaseConfigured() {
+  return SUPABASE_URL.indexOf("PASTE_") === -1 && SUPABASE_ANON_KEY.indexOf("PASTE_") === -1
+    && /^https:\/\/.+/.test(SUPABASE_URL);
+}
+
+// Stable per-device ID (browser/device badalne par naya ID = naya device maana jayega)
+function getDeviceId() {
+  let id = null;
+  try { id = localStorage.getItem(DEVICE_KEY); } catch(_) {}
+  if(!id) {
+    if(crypto && crypto.randomUUID) {
+      id = crypto.randomUUID();
+    } else {
+      id = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        const v = c === "x" ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+    try { localStorage.setItem(DEVICE_KEY, id); } catch(_) {}
+  }
+  return id;
+}
 
 function unlockSite() {
   const gate = $("passGate");
-  if(gate && gate.parentNode) gate.parentNode.removeChild(gate);
+  if(gate) gate.style.display = "none";
 }
 
-function tryPassKey() {
+// Header lock button → dobara pass-key maango (local unlock flag hata deta hai)
+function lockSite() {
+  try { localStorage.removeItem(GATE_KEY); } catch(_) {}
+  const gate = $("passGate");
+  if(!gate) return;
+  $("passKeyInput").value = "";
+  $("passKeyError").textContent = "";
+  gate.style.display = "flex";
+  $("passKeyInput").focus();
+}
+
+// Supabase PostgREST RPC → claim_key(p_key, p_device)
+async function claimKeyRemote(key, device) {
+  const res = await fetch(SUPABASE_URL.replace(/\/$/, "") + "/rest/v1/rpc/claim_key", {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ p_key: key, p_device: device })
+  });
+  if(!res.ok) throw new Error("server " + res.status);
+  return await res.json();
+}
+
+async function tryPassKey() {
   const val = ($("passKeyInput").value || "").trim();
-  if(PASS_KEYS.indexOf(val) !== -1) {
-    try { localStorage.setItem(GATE_KEY, "1"); } catch(_) {}
-    unlockSite();
-  } else {
-    $("passKeyError").textContent = "✘ Galat pass key — dobara try karo.";
-    $("passKeyInput").value = "";
-    $("passKeyInput").focus();
+  const err = $("passKeyError");
+  const btn = $("passKeyBtn");
+
+  if(!supabaseConfigured()) {
+    err.textContent = "⚠ Setup adhoora: file me SUPABASE_URL aur SUPABASE_ANON_KEY bharo.";
+    return;
+  }
+  if(!val) { err.textContent = "Pass key daalo."; return; }
+
+  btn.disabled = true;
+  err.style.color = "#91a2b8";
+  err.textContent = "Checking…";
+  try {
+    const out = await claimKeyRemote(val, getDeviceId());
+    err.style.color = "#ff8995";
+    if(out && out.ok) {
+      try { localStorage.setItem(GATE_KEY, "1"); } catch(_) {}
+      unlockSite();
+    } else if(out && out.reason === "bound") {
+      err.textContent = "✘ Ye key pehle hi kisi DUSRE device pe registered hai.";
+      $("passKeyInput").value = ""; $("passKeyInput").focus();
+    } else {
+      err.textContent = "✘ Galat pass key — dobara try karo.";
+      $("passKeyInput").value = ""; $("passKeyInput").focus();
+    }
+  } catch(e) {
+    err.style.color = "#ffad42";
+    err.textContent = "⚠ Server se connect nahi ho paya (" + e.message + "). Internet/config check karo.";
+  } finally {
+    btn.disabled = false;
   }
 }
 
 (function initGate() {
+  // Listeners hamesha attach karo — lock/unlock dono state me chahiye
+  $("passKeyBtn").addEventListener("click", tryPassKey);
+  $("passKeyInput").addEventListener("keydown", e => { if(e.key === "Enter") tryPassKey(); });
+  $("lockBtn").addEventListener("click", lockSite);
+
   let unlocked = false;
   try { unlocked = localStorage.getItem(GATE_KEY) === "1"; } catch(_) {}
   if(unlocked) { unlockSite(); return; }
-  $("passKeyBtn").addEventListener("click", tryPassKey);
-  $("passKeyInput").addEventListener("keydown", e => { if(e.key === "Enter") tryPassKey(); });
   $("passKeyInput").focus();
 })();
+
+// Floating help button → contact menu (Telegram / Instagram) toggle
+$("helpFab").addEventListener("click", () => {
+  const m = $("helpFabMenu");
+  m.style.display = (m.style.display === "flex") ? "none" : "flex";
+});
 
 load();
 render();
